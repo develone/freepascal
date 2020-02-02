@@ -3086,9 +3086,9 @@ type
 {$PUSH}
  {$WARN 6018 OFF} (* Unreachable code due to compile time evaluation *)
             if ControllerSupport then
-             controllertype:=tcontrollertype(tokenreadenum(sizeof(tcontrollertype)))
+             controllertype:=tokenreadlongint
             else
-             ControllerType:=ct_none;
+             ControllerType:=-1;
 {$POP}
            endpos:=replaytokenbuf.pos;
            if endpos-startpos<>expected_size then
@@ -3166,7 +3166,7 @@ type
 {$PUSH}
  {$WARN 6018 OFF} (* Unreachable code due to compile time evaluation *)
             if ControllerSupport then
-              tokenwriteenum(controllertype,sizeof(tcontrollertype));
+              tokenwritelongint(controllertype);
 {$POP}
            endpos:=recordtokenbuf.pos;
            size:=endpos-startpos;

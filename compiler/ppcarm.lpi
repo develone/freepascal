@@ -22,13 +22,17 @@
     </PublishOptions>
     <RunParams>
       <local>
+        <CommandLineParams Value="-XPC:\ST\STM32CubeIDE_1.2.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.win32_1.0.0.201904181610\tools\bin\arm-none-eabi- -Tembedded -Mobjfpc -O- -gw4 -godwarfcpp -Cparmv7em modules.pp -sh -Fbstm32.conf -WpSTM32F401RE"/>
         <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+        <WorkingDirectory Value="C:\Users\ring\devel\modulestest"/>
       </local>
       <FormatVersion Value="2"/>
       <Modes Count="1">
         <Mode0 Name="default">
           <local>
+            <CommandLineParams Value="-XPC:\ST\STM32CubeIDE_1.2.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.win32_1.0.0.201904181610\tools\bin\arm-none-eabi- -Tembedded -Mobjfpc -O- -gw4 -godwarfcpp -Cparmv7em modules.pp -sh -Fbstm32.conf -WpSTM32F401RE"/>
             <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T &apos;Lazarus Run Output&apos; -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+            <WorkingDirectory Value="C:\Users\ring\devel\modulestest"/>
           </local>
         </Mode0>
       </Modes>

@@ -409,8 +409,10 @@ implementation
 {$warn 6018 off} { Unreachable code due to compile time evaluation }
         { CPU targets with microcontroller support can add a controller specific unit }
         if ControllerSupport and (target_info.system in systems_embedded) and
-          (current_settings.controllertype<>ct_none) and
-          (embedded_controllers[current_settings.controllertype].controllerunitstr<>'') then
+          (current_settings.controllertype>=0) and
+          (current_settings.controllertype<=high(embedded_controllers)) and
+          (embedded_controllers[current_settings.controllertype].controllerunitstr<>'') and
+          (not (mo_hint_platform in current_module.moduleoptions)) then
           AddUnit(embedded_controllers[current_settings.controllertype].controllerunitstr);
 {$pop}
       end;

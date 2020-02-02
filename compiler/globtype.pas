@@ -382,6 +382,15 @@ interface
        );
        tmoduleflags = set of tmoduleflag;
 
+     type
+       tlinkerdefine = record
+         replace: boolean;
+         symbol,
+         value: string;
+       end;
+
+       tcontrollertype = longint;
+
     type
        ttargetswitchinfo = record
           name: string[22];
@@ -391,6 +400,8 @@ interface
           isglobal: boolean;
           define: string[25];
        end;
+
+
 
     const
        OptimizerSwitchStr : array[toptimizerswitch] of string[18] = ('',

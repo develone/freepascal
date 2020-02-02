@@ -46,10 +46,6 @@ Type
       fpu_vfp
      );
 
-   tcontrollertype =
-     (ct_none
-     );
-
    tcontrollerdatatype = record
       controllertypestr, controllerunitstr: string[20];
       cputype: tcputype; fputype: tfputype;
@@ -70,15 +66,7 @@ Const
    { target cpu string (used by compiler options) }
    target_cpu_string = 'aarch64';
 
-   { We know that there are fields after sramsize
-     but we don't care about this warning }
-   {$PUSH}
-    {$WARN 3177 OFF}
-   embedded_controllers : array [tcontrollertype] of tcontrollerdatatype =
-   (
-      (controllertypestr:''; controllerunitstr:''; cputype:cpu_none; fputype:fpu_none; flashbase:0; flashsize:0; srambase:0; sramsize:0));
-   {$POP}
-
+   embedded_controllers : array of tcontrollerdatatype = nil;
    { calling conventions supported by the code generator }
    supported_calling_conventions : tproccalloptions = [
      pocall_internproc,

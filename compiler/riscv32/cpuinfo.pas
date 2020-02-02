@@ -86,36 +86,7 @@ Const
    { for this platform? }
    ControllerSupport = true;
 
-   { We know that there are fields after sramsize
-     but we don't care about this warning }
-   {$PUSH}
-    {$WARN 3177 OFF}
-   embedded_controllers : array [tcontrollertype] of tcontrollerdatatype =
-   (
-      (controllertypestr:''            ; controllerunitstr:''; cputype:cpu_none; fputype:fpu_none; flashbase:0; flashsize:0; srambase:0; sramsize:0),
-      (controllertypestr:'FE310G000'   ; controllerunitstr:'FE310G000';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20400000; flashsize:$01000000; srambase:$80000000; sramsize:$00004000),
-      (controllertypestr:'FE310G002'   ; controllerunitstr:'FE310G002';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20010000; flashsize:$00400000; srambase:$80000000; sramsize:$00004000),
-      (controllertypestr:'HIFIVE1'     ; controllerunitstr:'FE310G000';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20400000; flashsize:$01000000; srambase:$80000000; sramsize:$00004000),
-      (controllertypestr:'HIFIVE1REVB' ; controllerunitstr:'FE310G002';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20010000; flashsize:$00400000; srambase:$80000000; sramsize:$00004000),
-      (controllertypestr:'REDFIVE'     ; controllerunitstr:'FE310G002';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20010000; flashsize:$00400000; srambase:$80000000; sramsize:$00004000),
-      (controllertypestr:'REDFIVETHING'; controllerunitstr:'FE310G002';   cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$20010000; flashsize:$02400000; srambase:$80000000; sramsize:$00004000),
-
-      (controllertypestr:'GD32VF103C4' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00004000; srambase:$20000000; sramsize:$00001800),
-      (controllertypestr:'GD32VF103C6' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00008000; srambase:$20000000; sramsize:$00002800),
-      (controllertypestr:'GD32VF103C8' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00010000; srambase:$20000000; sramsize:$00005000),
-      (controllertypestr:'GD32VF103CB' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00008000),
-      (controllertypestr:'GD32VF103R4' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00004000; srambase:$20000000; sramsize:$00001800),
-      (controllertypestr:'GD32VF103R6' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00008000; srambase:$20000000; sramsize:$00002800),
-      (controllertypestr:'GD32VF103R8' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00010000; srambase:$20000000; sramsize:$00005000),
-      (controllertypestr:'GD32VF103RB' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00008000),
-      (controllertypestr:'GD32VF103T4' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00004000; srambase:$20000000; sramsize:$00001800),
-      (controllertypestr:'GD32VF103T6' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00008000; srambase:$20000000; sramsize:$00002800),
-      (controllertypestr:'GD32VF103T8' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00010000; srambase:$20000000; sramsize:$00005000),
-      (controllertypestr:'GD32VF103TB' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00008000),
-      (controllertypestr:'GD32VF103V8' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00010000; srambase:$20000000; sramsize:$00005000),
-      (controllertypestr:'GD32VF103VB' ; controllerunitstr:'GD32VF103XX'; cputype:cpu_rv32imac; fputype:fpu_none; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00008000)
-   );
-   {$POP}
+   embedded_controllers : array of tcontrollerdatatype = nil;
 
    { calling conventions supported by the code generator }
    supported_calling_conventions : tproccalloptions = [

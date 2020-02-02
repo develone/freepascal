@@ -159,6 +159,124 @@ begin
 {$endif}
 end;
 
+procedure ParseControllerTypes(const s: string);
+  var
+    sr: TRawByteSearchRec;
+
+    procedure ParseControllerConfig(const fn: string);
+
+    function ParseLinkerDefine(def: string): tlinkerdefine;
+        var
+          t: SizeInt;
+        begin
+          t:=pos(':',def);
+          if t<=0 then
+            message1(option_malformed_para,'Linker define: "'+def+'"');
+
+          result.replace:=false;
+          if pos('%',def)=1 then
+            begin
+              result.replace:=true;
+              result.symbol:=trim(Copy(def,2,t-2));
+            end
+          else
+            result.symbol:=trim(Copy(def,1,t-1));
+
+          delete(def,1,t);
+          result.value:=trim(def);
+        end;
+
+      var
+        f: textfile;
+        i: longint;
+        ln,
+        ctrl,
+        ctrlUnit,
+        linkerScr: String;
+        oldfilemode: Byte;
+        found: Boolean;
+      begin
+        oldfilemode:=filemode;
+        filemode:=0;
+        assign(f,fn);
+        {$push}{$I-}
+         reset(f);
+        {$pop}
+        filemode:=oldfilemode;
+        if ioresult<>0 then
+          begin
+            Message1(option_unable_open_file,fn);
+            exit;
+          end;
+
+        while not eof(f) do
+          begin
+            readln(f,ln);
+
+            ln:=trim(ln);
+            if (ln<>'') and (ln[1]<>';') then
+              begin
+                ctrl:=UpperCase(Trim(GetToken(ln,',')));
+                ctrlUnit:=Trim(GetToken(ln,','));
+                linkerScr:=Trim(GetToken(ln,','));
+
+                ln:=trim(ln);
+
+                found:=false;
+                for i := low(embedded_controllers) to high(embedded_controllers) do
+                  begin
+                    if embedded_controllers[i].controllertypestr=ctrl then
+                      begin
+                        Message1(option_target_is_already_set, ctrl);
+                        //writeln('Duplicate controller type entry: ',ctrl);
+
+                        found:=true;
+                        break;
+                      end;
+                  end;
+
+                if not found then
+                  begin
+                    setlength(embedded_controllers,high(embedded_controllers)+2);
+
+                    with embedded_controllers[high(embedded_controllers)] do
+                      begin
+                        controllertypestr:=ctrl;
+                        controllerunitstr:=ctrlUnit;
+                        linkerscript:=ExtractFilePath(fn)+linkerScr;
+
+                        setlength(linkerdefines,0);
+                        while ln<>'' do
+                          begin
+                            setlength(linkerdefines,high(linkerdefines)+2);
+                            linkerdefines[high(linkerdefines)]:=ParseLinkerDefine(trim(GetToken(ln,',')));
+
+                            ln:=trim(ln);
+                          end;
+                      end;
+                  end;
+              end;
+          end;
+
+        closefile(f);
+      end;
+  begin
+{$PUSH}
+{$WARN 6018 OFF} (* Unreachable code due to compile time evaluation *)
+    if ControllerSupport then
+      begin
+        if FindFirst(s,faAnyFile,sr) = 0 then
+          begin
+            repeat
+              ParseControllerConfig(sr.Name);
+            until FindNext(sr)<>0;
+
+            FindClose(sr);
+          end;
+      end;
+{$POP}
+  end;
+
 
 {****************************************************************************
                                  Toption
@@ -468,7 +586,7 @@ const
 
   procedure ListControllerTypes (OrigString: TCmdStr);
   var
-    controllertype : tcontrollertype;
+    controllertype : longint;
   begin
 {$PUSH}
  {$WARN 6018 OFF} (* Unreachable code due to compile time evaluation *)
@@ -476,7 +594,7 @@ const
      begin
       SplitLine (OrigString, ControllerListPlaceholder, HS3);
       hs1:='';
-      for controllertype:=low(tcontrollertype) to high(tcontrollertype) do
+      for controllertype:=low(embedded_controllers) to high(embedded_controllers) do
        begin
         if (OrigString = '') then
          begin
@@ -1058,7 +1176,7 @@ begin
          (opt[1]='-') and
          (
           ((length(opt)>1) and (opt[2] in ['i','d','v','T','u','n','X','l','U'])) or
-          ((length(opt)>3) and (opt[2]='F') and (opt[3]='e')) or
+          ((length(opt)>3) and (opt[2]='F') and (opt[3] in ['b','e'])) or
           ((length(opt)>3) and (opt[2]='C') and (opt[3]='p')) or
           ((length(opt)>3) and (opt[2]='W') and (opt[3] in ['m','p']))
          )
@@ -1610,6 +1728,9 @@ begin
                case c of
                  'a' :
                    autoloadunits:=more;
+                 'b':
+                   if FirstPass then
+                     ParseControllerTypes(More);
                  'c' :
                    begin
                      { if we first specify that the system code page should be
@@ -3510,19 +3631,22 @@ procedure read_arguments(cmd:TCmdStr);
 
 {$PUSH}
 {$WARN 6018 OFF} { Unreachable code due to compile time evaluation }
-      if ControllerSupport then
+      writeln('def_cpu_macros controllersupport');
+      writeln(init_settings.controllertype);
+      if ControllerSupport and (init_settings.controllertype>=0 ) then
         begin
-          for controller:=low(tcontrollertype) to high(tcontrollertype) do
-            begin
-              s:=embedded_controllers[controller].controllertypestr;
-              if s<>'' then
-                undef_system_macro('FPC_MCU_'+s);
-            end;
+          //for controller:=low(tcontrollertype) to high(tcontrollertype) do
+          //  begin
+          //    s:=embedded_controllers[controller].controllertypestr;
+          //    if s<>'' then
+          //      undef_system_macro('FPC_MCU_'+s);
+          //  end;
           s:=embedded_controllers[init_settings.controllertype].controllertypestr;
           if s<>'' then
             def_system_macro('FPC_MCU_'+s);
         end;
 {$POP}
+      writeln('~def_cpu_macros controllersupport');
 
       { define abi }
       for abi:=low(tabi) to high(tabi) do
@@ -3872,9 +3996,9 @@ begin
       case target_info.system of
 {$ifdef AVR}
         system_avr_embedded:
-          if init_settings.controllertype=ct_avrsim then
-            heapsize:=8192
-          else
+          // TODO if init_settings.controllertype=ct_avrsim then
+          // TODO  heapsize:=8192
+          // TODO else
             heapsize:=128;
 {$endif AVR}
         system_arm_embedded:
@@ -4576,8 +4700,9 @@ begin
 {$push}
 {$warn 6018 off} { Unreachable code due to compile time evaluation }
   if ControllerSupport and (target_info.system in systems_embedded) and
-    (init_settings.controllertype<>ct_none) then
+    (init_settings.controllertype<>-1) then
     begin
+      writeln('set_system_macro');
       with embedded_controllers[init_settings.controllertype] do
         begin
           set_system_macro('FPC_FLASHBASE',tostr(flashbase));
@@ -4589,6 +4714,7 @@ begin
           set_system_macro('FPC_BOOTBASE',tostr(bootbase));
           set_system_macro('FPC_BOOTSIZE',tostr(bootsize));
         end;
+      writeln('~set_system_macro');
     end;
 {$pop}
   { as stackalign is not part of the alignment record, we do not need to define the others alignments for symmetry yet }

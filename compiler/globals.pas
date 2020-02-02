@@ -179,7 +179,7 @@ interface
 {$endif defined(LLVM) and not defined(GENERIC_CPU)}
 
         { CPU targets with microcontroller support can add a controller specific unit }
-         controllertype   : tcontrollertype;
+         controllertype   : longint;
 
          { WARNING: this pointer cannot be written as such in record token }
          pmessage : pmessagestaterecord;
@@ -572,7 +572,7 @@ interface
 {$if defined(LLVM) and not defined(GENERIC_CPU)}
         llvmversion    : llvmver_7_0;
 {$endif defined(LLVM) and not defined(GENERIC_CPU)}
-        controllertype : ct_none;
+        controllertype : -1;
         pmessage : nil;
       );
 
@@ -607,7 +607,7 @@ interface
     function Setoptimizecputype(const s:string;var a:tcputype):boolean;
     function Setcputype(const s:string;var a:tsettings):boolean;
     function SetFpuType(const s:string;var a:tfputype):boolean;
-    function SetControllerType(const s:string;var a:tcontrollertype):boolean;
+    function SetControllerType(const s:string;var a:longint):boolean;
     function HandleFeature(const s : string) : boolean;
     function SetMinFPConstPrec(const s: string; var a: tfloattype) : boolean;
 
@@ -1292,9 +1292,9 @@ implementation
       end;
 
 
-    function SetControllerType(const s:string;var a:tcontrollertype):boolean;
+    function SetControllerType(const s:string;var a:longint):boolean;
       var
-        t  : tcontrollertype;
+        t  : longint;
         hs : string;
       begin
 { The following check allows to reduce amount of code for platforms  }
@@ -1305,7 +1305,7 @@ implementation
          begin
           result:=false;
           hs:=Upper(s);
-          for t:=low(tcontrollertype) to high(tcontrollertype) do
+          for t:=low(embedded_controllers) to high(embedded_controllers) do
             if embedded_controllers[t].controllertypestr=hs then
               begin
                 a:=t;
@@ -1315,7 +1315,7 @@ implementation
          end
         else
          begin
-          a := ct_none;
+          a := -1;
           Result := true;
          end;
 {$POP}

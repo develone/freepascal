@@ -66,16 +66,13 @@ Type
       fpu_avx512f
      );
 
-   tcontrollertype =
-     (ct_none
-     );
-
    tcontrollerdatatype = record
-      controllertypestr, controllerunitstr: string[20];
-      cputype: tcputype; fputype: tfputype;
-      flashbase, flashsize, srambase, sramsize, eeprombase, eepromsize, bootbase, bootsize: dword;
+     controllertypestr, controllerunitstr: string;
+     linkerscript: string;
+     linkerdefines: array of tlinkerdefine;
+     cputype : tcputype;
+     flashbase, flashsize, srambase, sramsize, eeprombase, eepromsize, bootbase, bootsize: dword; 
    end;
-
 
 Const
    { Is there support for dealing with multiple microcontrollers available }
@@ -86,14 +83,7 @@ Const
    { target cpu string (used by compiler options) }
    target_cpu_string = 'x86_64';
 
-   { We know that there are fields after sramsize
-     but we don't care about this warning }
-   {$PUSH}
-    {$WARN 3177 OFF}
-   embedded_controllers : array [tcontrollertype] of tcontrollerdatatype =
-   (
-      (controllertypestr:''; controllerunitstr:''; cputype:cpu_none; fputype:fpu_none; flashbase:0; flashsize:0; srambase:0; sramsize:0));
-   {$POP}
+   embedded_controllers : array of tcontrollerdatatype = nil;
 
    { calling conventions supported by the code generator }
    supported_calling_conventions : tproccalloptions = [
