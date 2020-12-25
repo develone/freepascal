@@ -370,32 +370,9 @@ implementation
 
 
     function tloadparentfpnode.pass_typecheck:tnode;
-{$ifdef dummy}
-      var
-        currpi : tprocinfo;
-        hsym   : tparavarsym;
-{$endif dummy}
       begin
         result:=nil;
         resultdef:=parentfpvoidpointertype;
-{$ifdef dummy}
-        { currently parentfps are never loaded in registers (FK) }
-        if (current_procinfo.procdef.parast.symtablelevel<>parentpd.parast.symtablelevel) then
-          begin
-            currpi:=current_procinfo;
-            { walk parents }
-            while (currpi.procdef.owner.symtablelevel>parentpd.parast.symtablelevel) do
-              begin
-                currpi:=currpi.parent;
-                if not assigned(currpi) then
-                  internalerror(2005040602);
-                hsym:=tparavarsym(currpi.procdef.parast.Find('parentfp'));
-                if not assigned(hsym) then
-                  internalerror(2005040601);
-                hsym.varregable:=vr_none;
-              end;
-          end;
-{$endif dummy}
       end;
 
 
@@ -404,7 +381,6 @@ implementation
         result:=nil;
         expectloc:=LOC_REGISTER;
       end;
-
 
 {*****************************************************************************
                              TADDRNODE
@@ -1040,7 +1016,13 @@ implementation
                          (right.resultdef.typ=enumdef) and
                          (tenumdef(htype).basedef=tenumdef(right.resultdef).basedef) and
                     ((tarraydef(left.resultdef).lowrange<>tenumdef(htype).min) or
-                     (tarraydef(left.resultdef).highrange<>tenumdef(htype).max)) then
+                     (tarraydef(left.resultdef).highrange<>tenumdef(htype).max) or
+                   { while we could assume that the value might not be out of range,
+                     memory corruption could have resulted in an illegal value,
+                     so do not skip the type conversion in case of range checking
+
+                     After all, range checking is a safety mean }
+                     (cs_check_range in current_settings.localswitches)) then
                    {Convert array indexes to low_bound..high_bound.}
                    inserttypeconv(right,cenumdef.create_subrange(tenumdef(right.resultdef),
                                                       asizeint(Tarraydef(left.resultdef).lowrange),
@@ -1076,10 +1058,15 @@ implementation
                                                          int64(Tarraydef(left.resultdef).lowrange),
                                                          int64(Tarraydef(left.resultdef).highrange),
                                                          true
-                                                        ))
+                                                        ));
                    end
                  else
-                   inserttypeconv(right,htype)
+                   begin
+                     inserttypeconv(right,htype);
+                     { insert type conversion so cse can pick it up }
+                     if (htype.size<ptrsinttype.size) and is_integer(htype) and not(cs_check_range in current_settings.localswitches) then
+                       inserttypeconv_internal(right,ptrsinttype);
+                   end;
                end;
              stringdef:
                if is_open_string(left.resultdef) then

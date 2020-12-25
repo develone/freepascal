@@ -79,9 +79,9 @@ unit agrvgas;
                   begin
                     if asminfo^.dollarsign<>'$' then
                       begin
-                        s:=s+ReplaceForbiddenAsmSymbolChars(symbol.name);
+                        s:=s+ApplyAsmSymbolRestrictions(symbol.name);
                         if assigned(relsymbol) then
-                          s:=s+'-'+ReplaceForbiddenAsmSymbolChars(relsymbol.name)
+                          s:=s+'-'+ApplyAsmSymbolRestrictions(relsymbol.name)
                       end
                     else
                       begin
@@ -159,7 +159,7 @@ unit agrvgas;
             begin
               hs:=o.ref^.symbol.name;
               if asminfo^.dollarsign<>'$' then
-                hs:=ReplaceForbiddenAsmSymbolChars(hs);
+                hs:=ApplyAsmSymbolRestrictions(hs);
               if o.ref^.offset>0 then
                hs:=hs+'+'+tostr(o.ref^.offset)
               else
@@ -247,7 +247,10 @@ unit agrvgas;
         Replace(result,'$ABI','ilp32');
 {$endif RISCV32}
 {$ifdef RISCV64}
-        Replace(result,'$ABI','lp64');
+        if target_info.abi=abi_riscv_hf then
+          Replace(result,'$ABI','lp64d')
+        else
+          Replace(result,'$ABI','lp64');
 {$endif RISCV64}
       end;
 
@@ -263,6 +266,7 @@ unit agrvgas;
          supported_targets : [system_riscv32_linux,system_riscv64_linux];
          flags : [af_needar,af_smartlink_sections];
          labelprefix : '.L';
+         labelmaxlen : -1;
          comment : '# ';
          dollarsign: '$';
        );

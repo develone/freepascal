@@ -170,6 +170,7 @@ type
    FLock     = Record
                 l_type  : cshort;       { lock type: read/write, etc. }
                 l_whence: cshort;       { type of l_start }
+                { this must be really kernel_off_t: it must be 32 bit on i386 }
                 l_start : kernel_off_t; { starting offset }
                 l_len   : kernel_off_t; { len = 0 means until end of file }
                 l_pid   : pid_t;        { lock owner }
@@ -306,7 +307,7 @@ CONST
     { SIGCHLD or CLONE_CHILD_CLEARTID or CLONE_CHILD_SETTID }
     clone_flags_fork = $01200011;
 
-{$if defined(cpuarm) or defined(cpualpha) or defined(cpublackfin) or defined(cpum68k) or defined(aarch64) or defined(riscv32) or defined(riscv64)}
+{$if defined(cpuarm) or defined(cpualpha) or defined(cpublackfin) or defined(cpum68k) or defined(cpuaarch64)}
     O_LARGEFILE =   $20000;
 {$endif}
 {$if defined(cpusparc) or defined(cpusparc64)}
@@ -315,11 +316,14 @@ CONST
 {$if defined(cpupowerpc)}
     O_LARGEFILE =   $10000;
 {$endif}
-{$if defined(cpui386) or defined(cpux86_64) or defined(cpuia64)}
+{$if defined(cpui386) or defined(cpux86_64) or defined(cpuia64) or defined(cpuxtensa) or defined(cpuriscv32)}
     O_LARGEFILE =    $8000;
 {$endif}
 {$if defined(cpumips) or defined(cpumipsel)}
     O_LARGEFILE =    $2000;
+{$endif}
+{$if defined(cpuriscv64)}
+    O_LARGEFILE =    $0;
 {$endif}
     { mode_t possible values                                 }
     S_IRUSR =  %0100000000;     { Read permission for owner   }
@@ -378,11 +382,20 @@ CONST
   F_SetFd  = 2;
   F_GetFl  = 3;
   F_SetFl  = 4;
+
+{$if defined(cpusparc) or defined(cpusparc64)}
+  F_GetLk  = 7;
+  F_SetLk  = 8;
+  F_SetLkW = 9;
+  F_SetOwn = 5;
+  F_GetOwn = 6;
+{$else}
   F_GetLk  = 5;
   F_SetLk  = 6;
   F_SetLkW = 7;
   F_SetOwn = 8;
   F_GetOwn = 9;
+{$endif}
 
 { getrlimit/ugetrlimit resource parameter constants }
 const
@@ -399,7 +412,11 @@ const
   RLIMIT_LOCKS = 10;    { maximum file locks held  }
 
 type
+{$ifdef fs32bit}
   rlim_t = cULong;
+{$else}
+  rlim_t = cULongLong;
+{$endif}
   PRLimit = ^TRLimit;
   TRLimit = record
     rlim_cur : rlim_t;
@@ -407,11 +424,11 @@ type
   end;
 
   iovec = record
-            iov_base : pointer;
-	    iov_len  : size_t;
-	   end;
+    iov_base : pointer;
+    iov_len  : size_t;
+  end;
   tiovec=iovec;
-  piovec=^tiovec;		
+  piovec=^tiovec;
 
 {$if defined(cpupowerpc)}
 const

@@ -41,6 +41,7 @@ uses
 
       procedure a_load_reg_cgpara(list: TAsmList; size: tdef; r: tregister; const cgpara: TCGPara); override;
       procedure a_load_ref_cgpara(list: TAsmList; size: tdef; const r: treference; const cgpara: TCGPara); override;
+      procedure a_load_undefined_cgpara(list: TAsmList; size: tdef; const cgpara: TCGPara); override;
       procedure a_load_const_cgpara(list: TAsmList; tosize: tdef; a: tcgint; const cgpara: TCGPara); override;
      protected
        procedure a_load_ref_cgpara_init_src(list: TAsmList; const para: tcgpara; const initialref: treference; var refsize: tdef; out newref: treference);
@@ -269,7 +270,7 @@ implementation
             LOC_REFERENCE,LOC_CREFERENCE:
               begin
                  if assigned(location^.next) then
-                   internalerror(2010052906);
+                   internalerror(2010052901);
                  reference_reset_base(ref,cpointerdef.getreusable(size),location^.reference.index,location^.reference.offset,ctempposinvalid,newalignment(cgpara.alignment,cgpara.intsize-sizeleft),[]);
                  if (def_cgsize(size)<>OS_NO) and
                     (size.size=sizeleft) and
@@ -294,17 +295,27 @@ implementation
                    OS_NO:
                      a_loadmm_ref_reg(list,location^.def,location^.def,tmpref,location^.register,nil);
                    else
-                     internalerror(2010053101);
+                     internalerror(2010053105);
                  end;
               end
             else
-              internalerror(2010053111);
+              internalerror(2010053107);
           end;
           inc(totaloffset,tcgsize2size[location^.size]);
           dec(sizeleft,tcgsize2size[location^.size]);
           location:=location^.next;
           inc(paralocidx);
         end;
+    end;
+
+
+  procedure thlcgllvm.a_load_undefined_cgpara(list: TAsmList; size: tdef; const cgpara: TCGPara);
+    var
+      hreg: tregister;
+    begin
+      hreg:=getregisterfordef(list,size);
+      list.concat(taillvm.op_reg_size_undef(la_bitcast,hreg,size));
+      a_load_reg_cgpara(list,size,hreg,cgpara);
     end;
 
 
@@ -567,7 +578,7 @@ implementation
     { if this is a complex procvar, get the non-tmethod-like equivalent }
     if (pd.typ=procvardef) and
        not pd.is_addressonly then
-      pd:=tprocvardef(cprocvardef.getreusableprocaddr(pd));
+      pd:=tprocvardef(cprocvardef.getreusableprocaddr(pd,pc_address_only));
   end;
 
 
@@ -674,7 +685,7 @@ implementation
     begin
       if (fromsize=llvm_metadatatype) or
          (tosize=llvm_metadatatype) then
-        internalerror(2019122802);
+        internalerror(2019122812);
       sref:=make_simple_ref(list,ref,tosize);
       hreg:=register;
       (* typecast the pointer to the value instead of the value itself if
@@ -747,7 +758,7 @@ implementation
     begin
       if (fromsize=llvm_metadatatype) or
          (tosize=llvm_metadatatype) then
-        internalerror(2019122801);
+        internalerror(2019122805);
       op:=llvmconvop(fromsize,tosize,true);
       { converting from pointer to something else and vice versa is only
         possible via an intermediate pass to integer. Same for "something else"

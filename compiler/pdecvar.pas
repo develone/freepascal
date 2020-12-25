@@ -1707,6 +1707,10 @@ implementation
                    hdef:=generrordef;
                end;
 
+             { field type is a generic param so set a flag in the struct }
+             if assigned(hdef.typesym) and (sp_generic_para in hdef.typesym.symoptions) then
+               include(current_structdef.defoptions,df_has_generic_fields);
+
              { Process procvar directives }
              if maybe_parse_proc_directives(hdef) then
                semicoloneaten:=true;
@@ -1968,7 +1972,7 @@ implementation
               unionsymtable.addalignmentpadding;
 {$if defined(powerpc) or defined(powerpc64)}
               { parent inherits the alignment padding if the variant is the first "field" of the parent record/variant }
-              if (target_info.system in [system_powerpc_darwin, system_powerpc_macos, system_powerpc64_darwin]) and
+              if (target_info.system in [system_powerpc_darwin, system_powerpc_macosclassic, system_powerpc64_darwin]) and
                  is_first_type and
                  (recst.usefieldalignment=C_alignment) and
                  (maxpadalign>recst.padalignment) then

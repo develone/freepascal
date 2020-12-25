@@ -54,7 +54,7 @@ begin
       P.Dependencies.Add('os4units',[amiga]);
     P.SourcePath.Add('src/inc');
     P.SourcePath.Add('src/$(OS)');
-    P.SourcePath.Add('src/darwin',[iphonesim]);
+    P.SourcePath.Add('src/darwin',[iphonesim,ios]);
     P.SourcePath.Add('src/unix',AllUnixOSes);
     P.SourcePath.Add('src/os2commn',[os2,emx]);
     P.SourcePath.Add('src/amicommon',AllAmigaLikeOSes);
@@ -64,7 +64,7 @@ begin
     P.IncludePath.Add('src/unix',AllUnixOSes);
     P.IncludePath.add('src/amicommon',AllAmigaLikeOSes);
     P.IncludePath.Add('src/$(OS)');
-    P.IncludePath.Add('src/darwin',[iphonesim]);
+    P.IncludePath.Add('src/darwin',[iphonesim,ios]);
 
     T:=P.Targets.AddUnit('winevent.pp',WinEventOSes);
 
@@ -108,6 +108,16 @@ begin
        AddInclude('nwsys.inc',[netware]);
        AddUnit   ('video',[win16]);
        AddUnit   ('keyboard',[win16]);
+     end;
+
+    T:=P.Targets.AddUnit('vidcrt.pp', AllAmigaLikeOSes);
+    with T.Dependencies do
+     begin
+       AddInclude('crth.inc');
+       AddInclude('crt.inc');
+       AddUnit   ('video', AllAmigaLikeOSes);
+       AddUnit   ('keyboard', AllAmigaLikeOSes);
+       AddUnit   ('mouse', AllAmigaLikeOSes);
      end;
 
     T:=P.Targets.AddUnit('vesamode.pp',[go32v2,msdos]);

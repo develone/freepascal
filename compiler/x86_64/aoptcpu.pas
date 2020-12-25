@@ -73,9 +73,12 @@ uses
               case taicpu(p).opcode of
                 A_AND:
                   Result:=OptPass1AND(p);
+                A_IMUL:
+                  Result:=OptPass1Imul(p);
                 A_MOV:
                   Result:=OptPass1MOV(p);
                 A_MOVSX,
+                A_MOVSXD,
                 A_MOVZX:
                   Result:=OptPass1Movx(p);
                 A_MOVAPD,
@@ -87,6 +90,12 @@ uses
                 A_VMOVUPS,
                 A_VMOVUPD:
                   result:=OptPass1_V_MOVAP(p);
+                A_VMINSS,
+                A_VMINSD,
+                A_VMAXSS,
+                A_VMAXSD,
+                A_VSQRTSD,
+                A_VSQRTSS,
                 A_VDIVSD,
                 A_VDIVSS,
                 A_VSUBSD,
@@ -98,9 +107,7 @@ uses
                 A_VANDPD,
                 A_VANDPS,
                 A_VORPD,
-                A_VORPS,
-                A_VXORPD,
-                A_VXORPS:
+                A_VORPS:
                   result:=OptPass1VOP(p);
                 A_MULSD,
                 A_MULSS,
@@ -126,6 +133,16 @@ uses
                   result:=OptPass1FLD(p);
                 A_CMP:
                   result:=OptPass1Cmp(p);
+                A_VPXORD,
+                A_VPXORQ,
+                A_VXORPS,
+                A_VXORPD,
+                A_VPXOR:
+                  Result:=OptPass1VPXor(p);
+                A_XORPS,
+                A_XORPD,
+                A_PXOR:
+                  Result:=OptPass1PXor(p);
                 else
                   ;
               end;
@@ -156,6 +173,8 @@ uses
                   Result:=OptPass2Lea(p);
                 A_SUB:
                   Result:=OptPass2SUB(p);
+                A_ADD:
+                  Result:=OptPass2ADD(p);
                 else
                   ;
               end;
@@ -175,6 +194,8 @@ uses
               case taicpu(p).opcode of
                 A_MOV:
                   Result:=PostPeepholeOptMov(p);
+                A_AND:
+                  Result:=PostPeepholeOptAnd(p);
                 A_MOVSX:
                   Result:=PostPeepholeOptMOVSX(p);
                 A_MOVZX:
@@ -190,6 +211,8 @@ uses
                   Result:=PostPeepholeOptCall(p);
                 A_LEA:
                   Result:=PostPeepholeOptLea(p);
+                A_PUSH:
+                  Result:=PostPeepholeOptPush(p);
                 else
                   ;
               end;

@@ -482,7 +482,7 @@ implementation
         a typecast at the scanner level }
       if (struct.typ=recorddef) and
          not assigned(struct.typesym) then
-        internalerror(2011032811);
+        internalerror(2011032804);
       { walk over all fields that need initialization }
       str:='begin ';
       for i:=0 to struct.symtable.symlist.count-1 do
@@ -1397,7 +1397,7 @@ implementation
       if df_generic in tdef(recst.defowner).defoptions then
         tabstractrecordsymtable(recst).insert(hstaticvs)
       else
-        tabstractrecordsymtable(recst).get_unit_symtable.insert(hstaticvs);
+        tdef(tabstractrecordsymtable(recst).defowner).get_top_level_symtable(false).insert(hstaticvs);
 {$endif jvm}
       { generate the symbol for the access }
       sl:=tpropaccesslist.create;

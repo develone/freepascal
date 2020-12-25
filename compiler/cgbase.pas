@@ -107,6 +107,10 @@ interface
          ,addr_hi8
          ,addr_hi8_gs
          {$ENDIF}
+         {$IFDEF Z80}
+         ,addr_lo8
+         ,addr_hi8
+         {$ENDIF}
          {$IFDEF i8086}
          ,addr_dgroup      // the data segment group
          ,addr_fardataseg  // the far data segment of the current pascal module (unit or program)
@@ -208,7 +212,13 @@ interface
         { used on llvm, every temp gets its own "base register" }
         R_TEMPREGISTER,    { = 7 }
         { used on llvm for tracking metadata (every unique metadata has its own base register) }
-        R_METADATAREGISTER { = 8 }
+        R_METADATAREGISTER,{ = 8 }
+        { optional MAC16 (16 bit multiply-accumulate) registers on Xtensa }
+        R_MAC16REGISTER    { = 9 }
+
+        { do not add more than 16 elements (ifdef by cpu type if needed)
+          so we can store this in one nibble and pack TRegister
+          if the supreg width should be extended }
       );
 
       { Sub registers }
@@ -230,6 +240,17 @@ interface
         R_SUBMMX,     { = 12; 128 BITS }
         R_SUBMMY,     { = 13; 256 BITS }
         R_SUBMMZ,     { = 14; 512 BITS }
+{$ifdef Z80}
+        { Subregisters for the flags register (Z80) }
+        R_SUBFLAGCARRY,          { = 15; Carry flag }
+        R_SUBFLAGADDSUBTRACT,    { = 16; Add/Subtract flag }
+        R_SUBFLAGPARITYOVERFLOW, { = 17; Parity/Overflow flag }
+        R_SUBFLAGUNUSEDBIT3,     { = 18; Unused flag (bit 3) }
+        R_SUBFLAGHALFCARRY,      { = 19; Half Carry flag }
+        R_SUBFLAGUNUSEDBIT5,     { = 20; Unused flag (bit 5) }
+        R_SUBFLAGZERO,           { = 21; Zero flag }
+        R_SUBFLAGSIGN,           { = 22; Sign flag }
+{$else Z80}
         { Subregisters for the flags register (x86) }
         R_SUBFLAGCARRY,     { = 15; Carry flag }
         R_SUBFLAGPARITY,    { = 16; Parity flag }
@@ -239,10 +260,23 @@ interface
         R_SUBFLAGOVERFLOW,  { = 20; Overflow flag }
         R_SUBFLAGINTERRUPT, { = 21; Interrupt enable flag }
         R_SUBFLAGDIRECTION, { = 22; Direction flag }
-        R_SUBMM8B,          { = 23; for part of v regs on aarch64 }
-        R_SUBMM16B,         { = 24; for part of v regs on aarch64 }
+{$endif Z80}
         { subregisters for the metadata register (llvm) }
-        R_SUBMETASTRING     { = 25 }
+        R_SUBMETASTRING    { = 23 }
+{$ifdef aarch64}
+        , R_SUBMM8B          { = 24; for arrangement of v regs on aarch64 }
+        , R_SUBMM16B         { = 25; for arrangement of v regs on aarch64 }
+        , R_SUBMM4H          { = 26; for arrangement of v regs on aarch64 }
+        , R_SUBMM8H          { = 27; for arrangement of v regs on aarch64 }
+        , R_SUBMM2S          { = 28; for arrangement of v regs on aarch64 }
+        , R_SUBMM4S          { = 29; for arrangement of v regs on aarch64 }
+        , R_SUBMM1D          { = 30; for arrangement of v regs on aarch64 }
+        , R_SUBMM2D          { = 31; for arrangement of v regs on aarch64 }
+        , R_SUBMMB1          { = 32; for arrangement of v regs on aarch64; for use with ldN/stN }
+        , R_SUBMMH1          { = 33; for arrangement of v regs on aarch64; for use with ldN/stN }
+        , R_SUBMMS1          { = 34; for arrangement of v regs on aarch64; for use with ldN/stN }
+        , R_SUBMMD1          { = 35; for arrangement of v regs on aarch64; for use with ldN/stN }
+{$endif aarch64}
       );
       TSubRegisterSet = set of TSubRegister;
 
@@ -321,6 +355,7 @@ interface
         procedure clear;
         procedure add(s:tsuperregister);
         function addnodup(s:tsuperregister): boolean;
+        { returns the last element and removes it from the list }
         function get:tsuperregister;
         function readidx(i:word):tsuperregister;
         procedure deleteidx(i:word);
@@ -469,6 +504,8 @@ interface
       the source }
     procedure removeshuffles(var shuffle : tmmshuffle);
 
+    function is_float_cgsize(size: tcgsize): boolean;{$ifdef USEINLINE}inline;{$endif}
+
 implementation
 
     uses
@@ -566,9 +603,8 @@ implementation
     begin
       if length=0 then
         internalerror(200310142);
-      get:=buf^[0];
-      buf^[0]:=buf^[length-1];
       dec(length);
+      get:=buf^[length];
     end;
 
 
@@ -706,8 +742,30 @@ implementation
             result:=result+'my';
           R_SUBMMZ:
             result:=result+'mz';
+{$ifdef aarch64}
           R_SUBMM8B:
             result:=result+'m8b';
+          R_SUBMM16B:
+            result:=result+'m16b';
+          R_SUBMM4H:
+            result:=result+'m4h';
+          R_SUBMM8H:
+            result:=result+'m8h';
+          R_SUBMM2S:
+            result:=result+'m2s';
+          R_SUBMM4S:
+            result:=result+'m4s';
+          R_SUBMM2D:
+            result:=result+'m2d';
+          R_SUBMMB1:
+            result:=result+'mb1';
+          R_SUBMMH1:
+            result:=result+'mh1';
+          R_SUBMMS1:
+            result:=result+'ms1';
+          R_SUBMMD1:
+            result:=result+'md1';
+{$endif}
           else
             internalerror(200308252);
         end;
@@ -851,6 +909,12 @@ implementation
           exit;
         for i:=1 to shuffle.len do
           shuffle.shuffles[i]:=(shuffle.shuffles[i] and $f) or ((shuffle.shuffles[i] and $f0) shr 4);
+      end;
+
+
+    function is_float_cgsize(size: tcgsize): boolean;{$ifdef USEINLINE}inline;{$endif}
+      begin
+        result:=size in [OS_F32..OS_F128];
       end;
 
 

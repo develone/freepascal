@@ -70,6 +70,7 @@ implementation
         systemunit.insert(csyssym.create('Slice',in_slice_x));
         systemunit.insert(csyssym.create('Seg',in_seg_x));
         systemunit.insert(csyssym.create('Ord',in_ord_x));
+        systemunit.insert(csyssym.create('Chr',in_chr_byte));
         systemunit.insert(csyssym.create('Pred',in_pred_x));
         systemunit.insert(csyssym.create('Succ',in_succ_x));
         systemunit.insert(csyssym.create('Exclude',in_exclude_x_y));
@@ -112,6 +113,7 @@ implementation
         systemunit.insert(csyssym.create('Delete',in_delete_x_y_z));
         systemunit.insert(csyssym.create('GetTypeKind',in_gettypekind_x));
         systemunit.insert(csyssym.create('IsManagedType',in_ismanagedtype_x));
+        systemunit.insert(csyssym.create('IsConstValue',in_isconstvalue_x));
         systemunit.insert(csyssym.create('fpc_eh_return_data_regno', in_const_eh_return_data_regno));
         systemunit.insert(cconstsym.create_ord('False',constord,0,pasbool1type));
         systemunit.insert(cconstsym.create_ord('True',constord,1,pasbool1type));
@@ -243,7 +245,9 @@ implementation
               s64floattype:=cfloatdef.create(s64real,true);
               s80floattype:=cfloatdef.create(s80real,true);
               sc80floattype:=cfloatdef.create(sc80real,true);
-            end else begin
+            end
+          else
+            begin
               s32floattype:=nil;
               s64floattype:=nil;
               s80floattype:=nil;
@@ -253,6 +257,7 @@ implementation
 
       var
         hrecst : trecordsymtable;
+	pvmt_name : shortstring;
       begin
         symtablestack.push(systemunit);
         cundefinedtype:=cundefineddef.create(true);
@@ -307,7 +312,11 @@ implementation
         cunicodestringtype:=cstringdef.createunicode(true);
         { length=0 for shortstring is open string (needed for readln(string) }
         openshortstringtype:=cstringdef.createshort(0,true);
-{$ifdef x86}
+        if target_info.system=system_i386_watcom then
+          pvmt_name:='lower__pvmt'
+        else
+          pvmt_name:='pvmt';
+ {$ifdef x86}
         create_fpu_types;
 {$ifndef FPC_SUPPORT_X87_TYPES_ON_WIN64}
         if target_info.system=system_x86_64_win64 then
@@ -354,6 +363,13 @@ implementation
         sc80floattype:=cfloatdef.create(sc80real,true);
         s64currencytype:=corddef.create(scurrency,low(int64),high(int64),true);
 {$endif avr}
+{$ifdef z80}
+        s32floattype:=cfloatdef.create(s32real,true);
+        s64floattype:=cfloatdef.create(s64real,true);
+        s80floattype:=cfloatdef.create(s80real,true);
+        sc80floattype:=cfloatdef.create(sc80real,true);
+        s64currencytype:=corddef.create(scurrency,low(int64),high(int64),true);
+{$endif z80}
 {$ifdef mips}
         create_fpu_types;
         s64currencytype:=corddef.create(scurrency,low(int64),high(int64),true);
@@ -370,6 +386,10 @@ implementation
         create_fpu_types;
         s64currencytype:=corddef.create(scurrency,low(int64),high(int64),true);
 {$endif jvm}
+{$ifdef xtensa}
+        create_fpu_types;
+        s64currencytype:=corddef.create(scurrency,low(int64),high(int64),true);
+{$endif xtensa}
         set_default_int_types;
         { some other definitions }
         charpointertype:=cpointerdef.create(cansichartype);
@@ -623,7 +643,7 @@ implementation
             { can't use addtype for pvmt because the rtti of the pointed
               type is not available. The rtti for pvmt will be written implicitly
               by thev tblarray below }
-            systemunit.insert(ctypesym.create('$pvmt',pvmttype));
+            systemunit.insert(ctypesym.create('$'+pvmt_name,pvmttype));
             addfield(hrecst,cfieldvarsym.create('$length',vs_value,sizesinttype,[]));
             addfield(hrecst,cfieldvarsym.create('$mlength',vs_value,sizesinttype,[]));
             addfield(hrecst,cfieldvarsym.create('$parent',vs_value,pvmttype,[]));
@@ -672,6 +692,7 @@ implementation
 
       var
         oldcurrentmodule : tmodule;
+        pvmt_name : shortstring;
       begin
 {$ifndef FPC_SUPPORT_X87_TYPES_ON_WIN64}
         if target_info.system=system_x86_64_win64 then
@@ -763,9 +784,13 @@ implementation
         loadtype('metadata',llvm_metadatatype);
 {$endif llvm}
         loadtype('file',cfiletype);
+        if target_info.system=system_i386_watcom then
+          pvmt_name:='lower__pvmt'
+        else
+          pvmt_name:='pvmt';
         if not(target_info.system in systems_managed_vm) then
           begin
-            loadtype('pvmt',pvmttype);
+            loadtype(pvmt_name,pvmttype);
             loadtype('vtblarray',vmtarraytype);
             loadtype('__vtbl_ptr_type',vmttype);
           end;

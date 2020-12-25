@@ -227,6 +227,7 @@ interface
           procedure skipoldtpcomment(read_first_char:boolean);
           procedure readtoken(allowrecordtoken:boolean);
           function  readpreproc:ttoken;
+          function  readpreprocint(var value:int64;const place:string):boolean;
           function  asmgetchar:char;
        end;
 
@@ -275,7 +276,6 @@ interface
     Function SetCompileMode(const s:string; changeInit: boolean):boolean;
     Function SetCompileModeSwitch(s:string; changeInit: boolean):boolean;
     procedure SetAppType(NewAppType:tapptype);
-
 
 implementation
 
@@ -460,6 +460,16 @@ implementation
                   end;
               end;
           end;
+
+{$ifdef i8086}
+        { enable cs_force_far_calls when m_nested_procvars is enabled }
+        if switch=m_nested_procvars then
+          begin
+            include(current_settings.localswitches,cs_force_far_calls);
+            if changeinit then
+              include(init_settings.localswitches,cs_force_far_calls);
+          end;
+{$endif i8086}
       end;
 
 
@@ -603,6 +613,30 @@ implementation
                if changeinit then
                  include(init_settings.localswitches,cs_strict_var_strings);
              end;
+
+           { in delphi mode, excess precision is by default on }
+           if ([m_delphi] * current_settings.modeswitches <> []) then
+             begin
+               include(current_settings.localswitches,cs_excessprecision);
+               if changeinit then
+                 include(init_settings.localswitches,cs_excessprecision);
+             end;
+
+{$ifdef i8086}
+           { Do not force far calls in the TP mode by default, force it in other modes }
+           if (m_tp7 in current_settings.modeswitches) then
+             begin
+               exclude(current_settings.localswitches,cs_force_far_calls);
+               if changeinit then
+                 exclude(init_settings.localswitches,cs_force_far_calls);
+             end
+           else
+             begin
+               include(current_settings.localswitches,cs_force_far_calls);
+               if changeinit then
+                 include(init_settings.localswitches,cs_force_far_calls);
+             end;
+{$endif i8086}
 
             { Undefine old symbol }
             if (m_delphi in oldmodeswitches) then
@@ -929,8 +963,10 @@ type
     function evaluate(v:texprvalue;op:ttoken):texprvalue;
     procedure error(expecteddef, place: string);
     function isBoolean: Boolean;
+    function isInt: Boolean;
     function asBool: Boolean;
     function asInt: Integer;
+    function asInt64: Int64;
     function asStr: String;
     destructor destroy; override;
   end;
@@ -1106,7 +1142,7 @@ type
 
   function texprvalue.evaluate(v:texprvalue;op:ttoken):texprvalue;
 
-    function check_compatbile: boolean;
+    function check_compatible: boolean;
       begin
         result:=(
                   (is_ordinal(v.def) or is_fpu(v.def)) and
@@ -1145,6 +1181,12 @@ type
         begin
           if isBoolean then
             result:=texprvalue.create_bool(not asBool)
+          else if is_ordinal(def) then
+            begin
+              result:=texprvalue.create_ord(value.valueord);
+              result.def:=def;
+              calc_not_ordvalue(result.value.valueord,result.def);
+            end
           else
             begin
               error('Boolean', 'NOT');
@@ -1159,6 +1201,14 @@ type
             else
               begin
                 v.error('Boolean','OR');
+                result:=texprvalue.create_error;
+              end
+          else if is_ordinal(def) then
+            if is_ordinal(v.def) then
+              result:=texprvalue.create_ord(value.valueord or v.value.valueord)
+            else
+              begin
+                v.error('Ordinal','OR');
                 result:=texprvalue.create_error;
               end
           else
@@ -1177,6 +1227,14 @@ type
                 v.error('Boolean','XOR');
                 result:=texprvalue.create_error;
               end
+          else if is_ordinal(def) then
+            if is_ordinal(v.def) then
+              result:=texprvalue.create_ord(value.valueord xor v.value.valueord)
+            else
+              begin
+                v.error('Ordinal','XOR');
+                result:=texprvalue.create_error;
+              end
           else
             begin
               error('Boolean','XOR');
@@ -1193,6 +1251,14 @@ type
                 v.error('Boolean','AND');
                 result:=texprvalue.create_error;
               end
+          else if is_ordinal(def) then
+            if is_ordinal(v.def) then
+              result:=texprvalue.create_ord(value.valueord and v.value.valueord)
+            else
+              begin
+                v.error('Ordinal','AND');
+                result:=texprvalue.create_error;
+              end
           else
             begin
               error('Boolean','AND');
@@ -1200,7 +1266,7 @@ type
             end;
         end;
         _EQ,_NE,_LT,_GT,_GTE,_LTE,_PLUS,_MINUS,_STAR,_SLASH,_OP_DIV,_OP_MOD,_OP_SHL,_OP_SHR:
-        if check_compatbile then
+        if check_compatible then
           begin
             if (is_ordinal(def) and is_ordinal(v.def)) then
               begin
@@ -1328,14 +1394,19 @@ type
 
   function texprvalue.isBoolean: Boolean;
     var
-      i: integer;
+      i: int64;
     begin
       result:=is_boolean(def);
       if not result and is_integer(def) then
         begin
-          i:=asInt;
+          i:=asInt64;
           result:=(i=0)or(i=1);
         end;
+    end;
+
+  function texprvalue.isInt: Boolean;
+    begin
+      result:=is_integer(def);
     end;
 
   function texprvalue.asBool: Boolean;
@@ -1344,6 +1415,11 @@ type
     end;
 
   function texprvalue.asInt: Integer;
+    begin
+      result:=value.valueord.svalue;
+    end;
+
+  function texprvalue.asInt64: Int64;
     begin
       result:=value.valueord.svalue;
     end;
@@ -2186,6 +2262,11 @@ type
       begin
         current_scanner.skipspace;
         hs:=current_scanner.readid;
+        if hs='' then
+          begin
+            Message(scan_e_emptymacroname);
+            exit;
+          end;
         mac:=tmacro(search_macro(hs));
         if not assigned(mac) or (mac.owner <> current_module.localmacrosymtable) then
           begin
@@ -2458,9 +2539,15 @@ type
            macroIsString:=true;
            case hs of
              'TIME':
-               hs:=gettimestr;
+               if timestr<>'' then
+                 hs:=timestr
+               else
+                 hs:=gettimestr;
              'DATE':
-               hs:=getdatestr;
+               if datestr<>'' then
+                 hs:=datestr
+               else
+                 hs:=getdatestr;
              'DATEYEAR':
                begin
                  hs:=tostr(startsystime.Year);
@@ -4539,6 +4626,16 @@ type
               inc_comment_level;
             '}' :
               dec_comment_level;
+            '*' :
+              { in iso mode, comments opened by a curly bracket can be closed by asterisk, round bracket }
+              if m_iso in current_settings.modeswitches then
+                begin
+                  readchar;
+                  if c=')' then
+                    dec_comment_level
+                  else
+                    continue;
+                end;
             #10,#13 :
               linebreak;
             #26 :
@@ -4628,6 +4725,16 @@ type
                    else
                     found:=0;
                  end;
+              '}' :
+                { in iso mode, comments opened by asterisk, round bracket can be closed by a curly bracket }
+                if m_iso in current_settings.modeswitches then
+                  begin
+                    dec_comment_level;
+                    if comment_level=0 then
+                      found:=2
+                    else
+                      found:=0;
+                  end;
                '(' :
                  begin
                    if found=4 then
@@ -5649,6 +5756,25 @@ exit_label:
                readpreproc:=NOTOKEN;
              end;
          end;
+      end;
+
+
+    function tscannerfile.readpreprocint(var value:int64;const place:string):boolean;
+      var
+        hs : texprvalue;
+      begin
+        hs:=preproc_comp_expr;
+        if hs.isInt then
+          begin
+            value:=hs.asInt64;
+            result:=true;
+          end
+        else
+          begin
+            hs.error('Integer',place);
+            result:=false;
+          end;
+        hs.free;
       end;
 
 

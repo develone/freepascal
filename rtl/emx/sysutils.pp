@@ -684,9 +684,6 @@ end;
 
 
 type
-  TRec = record
-   T, D: word;
-  end;
   PSearchRec = ^SearchRec;
 
 Function InternalFindFirst (Const Path : RawByteString; Attr : Longint; out Rslt : TAbstractSearchRec; var Name: RawByteString) : Longint;
@@ -717,8 +714,8 @@ begin
     if Err = 0 then
      begin
       Rslt.ExcludeAttr := 0;
-      TRec (Rslt.Time).T := FStat^.TimeLastWrite;
-      TRec (Rslt.Time).D := FStat^.DateLastWrite;
+      Rslt.Time := cardinal (FStat^.DateLastWrite) shl 16 +
+                                                          FStat^.TimeLastWrite;
       if FSApi64 then
        begin
         Rslt.Size := FStat^.FileSize;
@@ -779,8 +776,8 @@ begin
     if Err = 0 then
      begin
       Rslt.ExcludeAttr := 0;
-      TRec (Rslt.Time).T := FStat^.TimeLastWrite;
-      TRec (Rslt.Time).D := FStat^.DateLastWrite;
+      Rslt.Time := cardinal (FStat^.DateLastWrite) shl 16 +
+                                                          FStat^.TimeLastWrite;
       if FSApi64 then
        begin
         Rslt.Size := FStat^.FileSize;
@@ -854,7 +851,7 @@ asm
  shld eax, ecx, 16
 @FGetDateEnd:
  pop ebx
- xorl edx,edx
+ xor edx,edx
 end {['eax', 'ebx', 'ecx', 'edx']};
 
 
@@ -1100,30 +1097,33 @@ asm
  mov ah, 2Ah
  call syscall
 {$IFDEF REGCALL}
- pop eax
+ pop edi
 {$ELSE REGCALL}
  mov edi, SystemTime
 {$ENDIF REGCALL}
- mov ax, cx
- stosw
- xor eax, eax
- mov al, 10
- mul dl
+ xchg ax, cx
  shl eax, 16
  mov al, dh
+ stosd
+ mov al, dl
+ shl eax, 16
+ mov al, cl
  stosd
  push edi
  mov ah, 2Ch
  call syscall
  pop edi
  xor eax, eax
- mov al, cl
- shl eax, 16
  mov al, ch
+ shl eax, 16
+ mov al, cl
  stosd
- mov al, dl
+ xor eax, eax
+ mov al, 10
+ mul dl
  shl eax, 16
  mov al, dh
+ rol eax, 16
  stosd
  pop edi
 end {['eax', 'ecx', 'edx', 'edi']};

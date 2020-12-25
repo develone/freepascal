@@ -2,12 +2,19 @@
 {$IFDEF chmInterface}
 type
 
+  { TFpDocChmWriter }
+
+  TFpDocChmWriter = class (TChmWriter)
+  protected
+    procedure FileAdded(AStream: TStream; const AEntry: TFileEntryRec); override;
+  end;
+
   { TCHMHTMLWriter }
 
   TCHMHTMLWriter = class(THTMLWriter)
   private
     FOutChm: TStream;
-    FChm: TChmWriter;
+    FChm: TFpDocChmWriter;
     FTempUncompressed: TStream;
     FTempUncompressedName: String;
     FChmTitle: String;
@@ -36,6 +43,17 @@ type
     Class procedure SplitImport(var AFilename, ALinkPrefix: String); override;
   end;
 {$ELSE} // implementation
+
+{ TFpDocChmWriter }
+
+procedure TFpDocChmWriter.FileAdded ( AStream: TStream;
+  const AEntry: TFileEntryRec ) ;
+begin
+  // Exclude Full text index for files starting from the dot
+  if Pos('.', AEntry.Name) <> 1 then
+    inherited FileAdded(AStream, AEntry);
+
+end;
 
 { TCHMHTMLWriter }
 
@@ -466,7 +484,7 @@ begin
 
   FTempUncompressedName := GetTempFileName+IntToStr(GetProcessID) +'.raw';
   FTempUncompressed := TFileStream.Create(FTempUncompressedName, fmOpenReadWrite  or fmCreate);
-  FChm := TChmWriter.Create(FOutChm, False);
+  FChm := TFpDocChmWriter.Create(FOutChm, False);
   FChm.Title := FChmTitle;
   FChm.TempRawStream := FTempUncompressed;
   FChm.OnGetFileData := @RetrieveOtherFiles;
@@ -598,6 +616,11 @@ begin
     begin  //split into filename and prefix
     ALinkPrefix := Copy(AFilename,i+1,Length(AFilename));
     SetLength(AFilename, i-1);
+    if copy(ALinkPrefix,1,2)='..' then // workaround for project files.
+      begin
+        ALinkPrefix := 'ms-its:' + ChangeFileExt(ExtractFileName(AFilename), '.chm') + '::/';
+        AFilename := ChangeFileExt(AFilename, '.xct');
+      end;
     end
   else if ALinkPrefix = '' then
     begin  //synthesize outdir\pgk.xct, ms-its:pkg.chm::/

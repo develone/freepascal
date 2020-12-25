@@ -1,5 +1,5 @@
 {
-    Copyright (c) 1998-2013 by the FPC Development Team
+    Copyright (c) 1998-2020 by the FPC Development Team
 
     Dumps the contents of a FPC unit file (PPU File)
 
@@ -47,7 +47,7 @@ uses
 
 const
   Title     = 'PPU-Analyser';
-  Copyright = 'Copyright (c) 1998-2013 by the Free Pascal Development Team';
+  Copyright = 'Copyright (c) 1998-2020 by the Free Pascal Development Team';
 
 { verbosity }
   v_none           = $0;
@@ -85,7 +85,9 @@ const
     { 17 } 'wasm',
     { 18 } 'sparc64',
     { 19 } 'riscv32',
-    { 20 } 'riscv64'
+    { 20 } 'riscv64',
+    { 21 } 'xtensa',
+    { 22 } 'z80'
     );
 
   CpuHasController : array[tsystemcpu] of boolean =
@@ -110,7 +112,9 @@ const
     { 17 } false {'wasm'},
     { 18 } false {'sparc64'},
     { 19 } false {'riscv32'},
-    { 20 } false {'riscv64'}
+    { 20 } false {'riscv64'},
+    { 21 } true  {'xtensa'},
+    { 22 } true  {'z80'}
     );
 
 { List of all supported system-cpu couples }
@@ -125,12 +129,12 @@ const
   { 6 }   'FreeBSD-i386',
   { 7 }   'Amiga',
   { 8 }   'Atari',
-  { 9 }   'MacOS-m68k',
+  { 9 }   'MacOSClassic-m68k',
   { 10 }  'Linux-m68k',
   { 11 }  'PalmOS-m68k',
   { 12 }  'Linux-alpha (obsolete)',
   { 13 }  'Linux-ppc',
-  { 14 }  'MacOS-ppc',
+  { 14 }  'MacOSClassic-ppc',
   { 15 }  'Solaris-i386',
   { 16 }  'BeOS-i386',
   { 17 }  'NetBSD-i386',
@@ -180,7 +184,7 @@ const
   { 61 }  'Darwin-x64',
   { 62 }  'Embedded-avr',
   { 63 }  'Haiku-i386',
-  { 64 }  'Darwin-ARM',
+  { 64 }  'iOS-ARM',
   { 65 }  'Solaris-x86-64',
   { 66 }  'Linux-MIPS',
   { 67 }  'Linux-MIPSel',
@@ -202,7 +206,7 @@ const
   { 83 }  'AROS-i386',
   { 84 }  'AROS-x86-64',
   { 85 }  'DragonFly-x86-64',
-  { 86 }  'Darwin-AArch64',
+  { 86 }  'iOS-AArch64',
   { 87 }  'iPhoneSim-x86-64',
   { 88 }  'Linux-AArch64',
   { 89 }  'Win16',
@@ -218,7 +222,18 @@ const
   { 99 }  'Embedded-RiscV64',
   { 100 } 'Android-AArch64',
   { 101 } 'Android-x86-64',
-  { 102 } 'Haiku-x86-64'
+  { 102 } 'Haiku-x86-64',
+  { 103 } 'Embedded-Xtensa',
+  { 104 } 'FreeRTos-Xtensa',
+  { 105 } 'Linux-Xtensa',
+  { 106 } 'FreeRTos-arm',
+  { 107 } 'Win64-AArch64',
+  { 108 } 'Embedded-Z80',
+  { 109 } 'ZXSpectrum-Z80',
+  { 110 } 'MSX-DOS-Z80',
+  { 111 } 'Darwin-AArch64',
+  { 112 } 'AmstradCPC-Z80',
+  { 113 } 'SinclairQL-m68k'
   );
 
 const
@@ -396,7 +411,7 @@ type
     cpu_variant_rv64im,
     cpu_variant_rv64i
   );
- 
+
   tcpu_type = record
      case tsystemcpu of
        cpu_no:                      { 0 }
@@ -443,7 +458,7 @@ type
           (cpu_riscv64 : tcpu_riscv64;);
      end;
 
-  
+
   TPpuModuleDef = class(TPpuUnitDef)
     ModuleFlags: tmoduleflags;
   end;
@@ -1630,7 +1645,9 @@ const
          (mask:pi_needs_tls;
          str:' uses TLS data pointer '),
          (mask:pi_uses_get_frame;
-         str:' uses get_frame')
+         str:' uses get_frame'),
+         (mask:pi_uses_ymm;
+         str:' uses ymm register (x86 only)')
   );
 var
   procinfooptions : tprocinfoflags;
@@ -1676,7 +1693,8 @@ const
      (mask:sp_generic_para;       str:'Generic Parameter'),
      (mask:sp_has_deprecated_msg; str:'Has Deprecated Message'),
      (mask:sp_generic_dummy;      str:'Generic Dummy'),
-     (mask:sp_explicitrename;     str:'Explicit Rename')
+     (mask:sp_explicitrename;     str:'Explicit Rename'),
+     (mask:sp_generic_const;      str:'Generic Constant Parameter')
   );
 var
   symoptions : tsymoptions;
@@ -1796,9 +1814,9 @@ end;
 procedure readcommonsym(const s:string; Def: TPpuDef = nil);
 var
   i: integer;
-  n: string;
+  n: ansistring;
 begin
-  n:=ppufile.getstring;
+  n:=readsymstr(ppufile);
   if Def <> nil then
     Def.Name:=n;
   i:=ppufile.getlongint;
@@ -2228,7 +2246,7 @@ const
          { target specific }
         'Executable Stack', {cs_executable_stack}
          { i8086 specific }
-        'Hude code', {cs_huge_code}
+        'Huge code', {cs_huge_code}
         'Win16 smart callbacks', {cs_win16_smartcallbacks}
          { Record usage of checkpointer experimental feature }
         'CheckPointer used', {cs_checkpointer_called}
@@ -2281,7 +2299,9 @@ const
         'Link using native linker', {cs_link_native}
         'Link for GNU linker version <=2.19', {cs_link_pre_binutils_2_19}
         'Link using vlink', {cs_link_vlink}
-        'Link-Time Optimization disabled for system unit' {cs_lto_nosystem}
+        'Link-Time Optimization disabled for system unit', {cs_lto_nosystem}
+        'Assemble on target OS', {cs_asemble_on_target}
+        'Use a memory model to support >2GB static data on 64 Bit target' {cs_large}
        );
     localswitchname : array[tlocalswitch] of string[50] =
        { Switches which can be changed locally }
@@ -2413,11 +2433,12 @@ const
          }
          'cs_opt_dead_values',
          { compiler checks for empty procedures/methods and removes calls to them if possible }
-         'cs_opt_remove_emtpy_proc',
+         'cs_opt_remove_empty_proc',
          'cs_opt_constant_propagate',
          'cs_opt_dead_store_eliminate',
          'cs_opt_forcenostackframe',
-         'cs_opt_use_load_modify_store'
+         'cs_opt_use_load_modify_store',
+         'cs_opt_unused_para'
        );
     var
          globalswitch  : tglobalswitch;
@@ -2732,7 +2753,8 @@ const
      (mask:df_not_registered_no_free;  str:'Unregistered/No free (invalid)'),
      (mask:df_llvm_no_struct_packing;  str:'LLVM unpacked struct'),
      (mask:df_internal;       str:'Internal'),
-     (mask:df_has_global_ref; str:'Has Global Ref')
+     (mask:df_has_global_ref; str:'Has Global Ref'),
+     (mask:df_has_generic_fields; str:'Has generic fields')
   );
   defstate : array[1..ord(high(tdefstate))] of tdefstateinfo=(
      (mask:ds_vmt_written;           str:'VMT Written'),
@@ -2748,7 +2770,7 @@ const
      (mask:gcf_class;       str:'Class'),
      (mask:gcf_record;      str:'Record')
   );
-  
+
 var
   defstates  : tdefstates;
   i, nb, len : longint;
@@ -3256,14 +3278,15 @@ const
    { ado_IsArrayOfConst     } 'ArrayOfConst',
    { ado_IsConstString      } 'ConstString',
    { ado_IsBitPacked        } 'BitPacked',
-   { ado_IsVector           } 'Vector'
+   { ado_IsVector           } 'Vector',
+   { ado_IsGeneric          } 'Generic'
   );
 var
   symoptions: tarraydefoptions;
   i: tarraydefoption;
   first: boolean;
 begin
-  ppufile.getset(tppuset1(symoptions));
+  ppufile.getset(tppuset2(symoptions));
   if symoptions<>[] then
    begin
      if ado_IsDynamicArray in symoptions then Include(ArrayDef.Options, aoDynamic);
@@ -4748,9 +4771,12 @@ begin
                    with TPpuSrcFile.Create(CurUnit.SourceFiles) do begin
                      Name:=getstring;
                      i:=getlongint;
-                     if i >= 0 then
-                       FileTime:=FileDateToDateTime(i);
-                     Writeln(['Source file ',sourcenumber,' : ',Name,' ',filetimestring(i)]);
+                     try
+                       if i >= 0 then
+                         FileTime:=FileDateToDateTime(i);
+                       Writeln(['Source file ',sourcenumber,' : ',Name,' ',filetimestring(i)]);
+                     except
+                     end;
                    end;
 
                    inc(sourcenumber);

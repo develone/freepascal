@@ -1243,7 +1243,10 @@ end;
 Procedure THandleStream.SetSize(const NewSize: Int64);
 
 begin
-  FileTruncate(FHandle,NewSize);
+  // We set the position afterwards, because the size can also be larger.
+  if not FileTruncate(FHandle,NewSize) then
+    Raise EInOutError.Create(SStreamSetSize);
+  Position:=NewSize;
 end;
 
 
@@ -1276,9 +1279,21 @@ begin
 
   If (THandle(FHandle)=feInvalidHandle) then
     If Mode=fmcreate then
+    begin
+      {$if declared(GetLastOSError)}
+      raise EFCreateError.createfmt(SFCreateErrorEx,[AFileName, SysErrorMessage(GetLastOSError)])
+      {$else}
       raise EFCreateError.createfmt(SFCreateError,[AFileName])
+      {$endif}
+    end
     else
+    begin
+      {$if declared(GetLastOSError)}
+      raise EFOpenError.Createfmt(SFOpenErrorEx,[AFilename, SysErrorMessage(GetLastOSError)]);
+      {$else}
       raise EFOpenError.Createfmt(SFOpenError,[AFilename]);
+      {$endif}
+    end;
 end;
 
 
@@ -1640,6 +1655,7 @@ begin
   NewLen:=Size-FPosition;
   If NewLen>Count then NewLen:=Count;
   Result:=FEncoding.GetAnsiString(FBytes,FPosition,NewLen);
+  Inc(FPosition,NewLen);
 end;
 
 procedure TStringStream.WriteAnsiString(const AString: AnsiString);
@@ -1689,6 +1705,7 @@ begin
     begin
     SetLength(Result, NewLen);
     Move(FBytes[FPosition],Result[1],NewLen);
+    inc(FPosition,Newlen);
     end;
 end;
 

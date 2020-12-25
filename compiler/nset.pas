@@ -257,7 +257,6 @@ implementation
          if is_array_constructor(right.resultdef) then
           begin
             arrayconstructor_to_set(right);
-            firstpass(right);
             if codegenerror then
              exit;
           end;
@@ -374,6 +373,25 @@ implementation
                      exit;
                    end;
                end;
+           end
+         { a in [a] => true, if a has no side effects }
+         else if (right.nodetype=addn) and
+           (taddnode(right).left.nodetype=setconstn) and
+           (tsetconstnode(taddnode(right).left).elements=0) and
+           (taddnode(right).right.nodetype=setelementn) and
+           (tsetelementnode(taddnode(right).right).right=nil) and
+           ((tsetelementnode(taddnode(right).right).left.isequal(left)) or
+            (
+              (tsetelementnode(taddnode(right).right).left.nodetype=typeconvn) and
+              (ttypeconvnode(tsetelementnode(taddnode(right).right).left).left.isequal(left))
+            )
+           ) and
+           not(might_have_sideeffects(left,[mhs_exceptions])) then
+           begin
+             t:=cordconstnode.create(1, pasbool1type, true);
+             typecheckpass(t);
+             result:=t;
+             exit;
            end;
       end;
 
@@ -424,8 +442,9 @@ implementation
          { both types must be compatible }
          if compare_defs(left.resultdef,right.resultdef,left.nodetype)=te_incompatible then
            IncompatibleTypes(left.resultdef,right.resultdef);
-         { Check if only when its a constant set }
-         if (left.nodetype=ordconstn) and (right.nodetype=ordconstn) then
+         { check if only when its a constant set and
+           ignore range nodes which are generic parameter derived }
+         if not (nf_generic_para in flags) and (left.nodetype=ordconstn) and (right.nodetype=ordconstn) then
           begin
             { upper limit must be greater or equal than lower limit }
             if (tordconstnode(left).value>tordconstnode(right).value) and
@@ -1080,7 +1099,7 @@ implementation
           end;
         if assigned(elseblock) then
           begin
-            WriteLn(T, PrintNodeIndention, '<block id="else">');;
+            WriteLn(T, PrintNodeIndention, '<block id="else">');
             PrintNodeIndent;
             XMLPrintNode(T, ElseBlock);
             PrintNodeUnindent;

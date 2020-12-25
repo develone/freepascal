@@ -268,6 +268,12 @@ interface
     {# Returns true, if def is a 64 bit type }
     function is_64bit(def : tdef) : boolean;
 
+    { returns true, if def is a longint type }
+    function is_s32bitint(def : tdef) : boolean;
+
+    { returns true, if def is a dword type }
+    function is_u32bitint(def : tdef) : boolean;
+
     { true, if def1 and def2 are both integers of the same bit size and sign }
     function are_equal_ints(def1, def2: tdef): boolean;
 
@@ -349,6 +355,10 @@ interface
         signdness, the result will also get that signdness }
     function get_common_intdef(ld, rd: torddef; keep_sign_if_equal: boolean): torddef;
 
+    { # calculates "not v" based on the provided def; returns true if the def
+        was negatable, false otherwise }
+    function calc_not_ordvalue(var v:Tconstexprint; var def:tdef):boolean;
+
     { # returns whether the type is potentially a valid type of/for an "univ" parameter
         (basically: it must have a compile-time size) }
     function is_valid_univ_para_type(def: tdef): boolean;
@@ -372,7 +382,8 @@ interface
 implementation
 
     uses
-       verbose,cutils;
+       verbose,cutils,
+       cpuinfo;
 
     { returns true, if def uses FPU }
     function is_fpu(def : tdef) : boolean;
@@ -1012,6 +1023,22 @@ implementation
       end;
 
 
+    { returns true, if def is a longint type }
+    function is_s32bitint(def : tdef) : boolean;
+      begin
+        result:=(def.typ=orddef) and
+          (torddef(def).ordtype=s32bit);
+      end;
+
+
+    { returns true, if def is a dword type }
+    function is_u32bitint(def : tdef) : boolean;
+      begin
+        result:=(def.typ=orddef) and
+          (torddef(def).ordtype=u32bit);
+      end;
+
+
     { true, if def1 and def2 are both integers of the same bit size and sign }
     function are_equal_ints(def1, def2: tdef): boolean;
       begin
@@ -1353,7 +1380,10 @@ implementation
                    (tarraydef(p).elementdef.typ=floatdef) and
                    (
                     (tarraydef(p).lowrange=0) and
-                    (tarraydef(p).highrange=3) and
+                    ((tarraydef(p).highrange=3) or
+                     (UseAVX and (tarraydef(p).highrange=7)) or
+                     (UseAVX512 and (tarraydef(p).highrange=15))
+                    ) and
                     (tfloatdef(tarraydef(p).elementdef).floattype=s32real)
                    )
                   ) or
@@ -1362,7 +1392,10 @@ implementation
                    (tarraydef(p).elementdef.typ=floatdef) and
                    (
                     (tarraydef(p).lowrange=0) and
-                    (tarraydef(p).highrange=1) and
+                    ((tarraydef(p).highrange=1) or
+                     (UseAVX and (tarraydef(p).highrange=3)) or
+                     (UseAVX512 and (tarraydef(p).highrange=7))
+                    )and
                     (tfloatdef(tarraydef(p).elementdef).floattype=s64real)
                    )
                   ) {or
@@ -1518,7 +1551,12 @@ implementation
           objectdef :
             result:=int_cgsize(def.size);
           floatdef:
-            if cs_fp_emulation in current_settings.moduleswitches then
+            if (cs_fp_emulation in current_settings.moduleswitches)
+{$ifdef xtensa}
+              or not(tfloatdef(def).floattype=s32real)
+              or not(FPUXTENSA_SINGLE in fpu_capabilities[current_settings.fputype])
+{$endif xtensa}
+              then
               result:=int_cgsize(def.size)
             else
               result:=tfloat2tcgsize[tfloatdef(def).floattype];
@@ -1741,6 +1779,59 @@ implementation
       end;
 
 
+    function calc_not_ordvalue(var v:Tconstexprint;var def:tdef):boolean;
+      begin
+        if not assigned(def) or (def.typ<>orddef) then
+          exit(false);
+        result:=true;
+        case torddef(def).ordtype of
+          pasbool1,
+          pasbool8,
+          pasbool16,
+          pasbool32,
+          pasbool64:
+            v:=byte(not(boolean(int64(v))));
+          bool8bit,
+          bool16bit,
+          bool32bit,
+          bool64bit:
+            begin
+              if v=0 then
+                v:=-1
+              else
+                v:=0;
+            end;
+          uchar,
+          uwidechar,
+          u8bit,
+          s8bit,
+          u16bit,
+          s16bit,
+          s32bit,
+          u32bit,
+          s64bit,
+          u64bit:
+            begin
+              { unsigned, equal or bigger than the native int size? }
+              if (torddef(def).ordtype in [u64bit,u32bit,u16bit,u8bit,uchar,uwidechar]) and
+                 (is_nativeord(def) or is_oversizedord(def)) then
+                begin
+                  { Delphi-compatible: not dword = dword (not word = longint) }
+                  { Extension: not qword = qword                              }
+                  v:=qword(not qword(v));
+                  { will be truncated by the ordconstnode for u32bit }
+                end
+              else
+                begin
+                  v:=int64(not int64(v));
+                  def:=get_common_intdef(torddef(def),torddef(sinttype),false);
+                end;
+            end;
+          else
+            result:=false;
+        end;
+      end;
+
     function is_valid_univ_para_type(def: tdef): boolean;
       begin
         result:=
@@ -1758,7 +1849,7 @@ implementation
 
     function is_typeparam(def : tdef) : boolean;{$ifdef USEINLINE}inline;{$endif}
       begin
-        result:=(def.typ=undefineddef);
+        result:=(def.typ=undefineddef) or (df_genconstraint in def.defoptions);
       end;
 
 

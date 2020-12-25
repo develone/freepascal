@@ -679,7 +679,8 @@ Implementation
                     begin
                       DebugMsg('Peephole AddAdc2Add performed', p);
 
-                      result:=RemoveCurrentP(p);
+                      RemoveCurrentP(p, hp1);
+                      Result := True;
                     end;
                   end;
                 A_SUB:
@@ -692,7 +693,8 @@ Implementation
 
                       taicpu(hp1).opcode:=A_SUB;
 
-                      result:=RemoveCurrentP(p);
+                      RemoveCurrentP(p, hp1);
+                      Result := True;
                     end;
                   end;
                 A_CLR:
@@ -795,9 +797,23 @@ Implementation
 
                            taicpu(hp3).loadreg(1, taicpu(p).oper[0]^.reg);
 
-                           RemoveCurrentP(p);
-                           RemoveCurrentP(p);
-                           result:=RemoveCurrentP(p);
+                           { We're removing 3 concurrent instructions.  Remove hp1
+                             and hp2 manually instead of calling RemoveCurrentP
+                             as this means we won't be calling UpdateUsedRegs 3 times }
+                           asml.Remove(hp1);
+                           hp1.Free;
+
+                           asml.Remove(hp2);
+                           hp2.Free;
+
+                           { By removing p last, we've guaranteed that p.Next is
+                             valid (storing it prior to removing the instructions
+                             may result in a dangling pointer if hp1 immediately
+                             follows p), and because hp1, hp2 and hp3 came from
+                             sequential calls to GetNextInstruction, it is
+                             guaranteed that UpdateUsedRegs will stop at hp3. [Kit] }
+                           RemoveCurrentP(p, hp3);
+                           Result := True;
                          end
                        else
                          begin
@@ -883,7 +899,8 @@ Implementation
                           not(MatchInstruction(hp1,[A_CALL,A_RCALL])) then
                           begin
                             DebugMsg('Peephole Mov2Nop performed', p);
-                            result:=RemoveCurrentP(p);
+                            RemoveCurrentP(p, hp1);
+                            Result := True;
                             exit;
                           end;
                       end;
@@ -1084,20 +1101,45 @@ Implementation
                       mov rX,...
                       mov rX,...
                     }
-                    else if GetNextInstruction(p,hp1) and MatchInstruction(hp1,A_MOV) then
+                    else if GetNextInstruction(p,hp1) and MatchInstruction(hp1,A_MOV) and
+                      { test condition here already instead in the while loop only, else MovMov2Mov 2 might be oversight }
+                      MatchInstruction(hp1,A_MOV) and
+                      MatchOperand(taicpu(p).oper[0]^, taicpu(hp1).oper[0]^) then
                       while MatchInstruction(hp1,A_MOV) and
                             MatchOperand(taicpu(p).oper[0]^, taicpu(hp1).oper[0]^) and
                             { don't remove the first mov if the second is a mov rX,rX }
                             not(MatchOperand(taicpu(hp1).oper[0]^,taicpu(hp1).oper[1]^)) do
                         begin
-                          DebugMsg('Peephole MovMov2Mov performed', p);
+                          DebugMsg('Peephole MovMov2Mov 1 performed', p);
 
-                          result:=RemoveCurrentP(p);
+                          RemoveCurrentP(p,hp1);
+                          Result := True;
 
                           GetNextInstruction(hp1,hp1);
                           if not assigned(hp1) then
                             break;
-                        end;
+                        end
+                    {
+                      This removes the second mov from
+                      mov rX,rY
+
+                      ...
+
+                      mov rX,rY
+
+                      if rX and rY are not modified in-between
+                    }
+                    else if GetNextInstructionUsingReg(p,hp1,taicpu(p).oper[1]^.reg) and
+                      MatchInstruction(hp1,A_MOV) and
+                      MatchOperand(taicpu(p).oper[0]^, taicpu(hp1).oper[0]^) and
+                      MatchOperand(taicpu(p).oper[1]^, taicpu(hp1).oper[1]^) and
+                      not(RegModifiedBetween(taicpu(p).oper[0]^.reg,p,hp1)) then
+                      begin
+                        DebugMsg('Peephole MovMov2Mov 2 performed', p);
+                        AllocRegBetween(taicpu(p).oper[0]^.reg,p,hp1,UsedRegs);
+                        RemoveInstruction(hp1);
+                        Result := True;
+                      end;
                   end;
                 A_SBIC,
                 A_SBIS:

@@ -62,8 +62,7 @@ Procedure ResetFPU;
 var
   l_fpucw : longint;
 begin
-  
-{$ifdef CPU68020}
+{$if defined(FPU68881) or defined(FPUCOLDFIRE)}
   asm 
     fmove.l fpcr,l_fpucw
   end;
@@ -106,13 +105,13 @@ begin
             begin
               { first check the more precise options }
               if (FpuState and (DivideByZero or AE_DividebyZero))<>0 then
-                res:=200
+                res:=208
               else if (FpuState and (Overflow or AE_Overflow))<>0 then
                 res:=205
               else if (FpuState and (Underflow or AE_Underflow))<>0 then
                 res:=206
               else if (FpuState and PSR_Denormal)<>0 then
-                res:=216
+                res:=206
               { else if (FpuState and (PSR_StackOverflow or PRS_StackUnderflow))<>0 then
                 res:=207, disabled, as there is no fpu stack }
               else if (FpuState and (OperandError or SignalingNan or BranchOnUnordered or AE_InvalidOperation))<>0 then

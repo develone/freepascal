@@ -361,7 +361,9 @@ implementation
         procedure check_range(hp:tnode; fordef: tdef);
           begin
             if (hp.nodetype=ordconstn) and
-               (fordef.typ<>errordef) then
+               (fordef.typ<>errordef) and
+               { the node was derived from a generic parameter so ignore range check }
+               not(nf_generic_para in hp.flags) then
               adaptrange(fordef,tordconstnode(hp).value,false,false,true);
           end;
 
@@ -1099,7 +1101,12 @@ implementation
                   Message(parser_w_register_list_ignored);
                 repeat
                   { it's possible to specify the modified registers }
-                  reg:=std_regnum_search(lower(cstringpattern));
+                  if token=_CSTRING then
+                    reg:=std_regnum_search(lower(cstringpattern))
+                  else if token=_CCHAR then
+                    reg:=std_regnum_search(lower(pattern))
+                  else
+                    reg:=NR_NO;
                   if reg<>NR_NO then
                     begin
                       if not(po_assembler in current_procinfo.procdef.procoptions) and assigned(hl) then
@@ -1111,7 +1118,10 @@ implementation
                     end
                   else
                     Message(asmr_e_invalid_register);
-                  consume(_CSTRING);
+                  if token=_CCHAR then
+                    consume(_CCHAR)
+                  else
+                    consume(_CSTRING);
                   if not try_to_consume(_COMMA) then
                     break;
                 until false;
@@ -1158,7 +1168,7 @@ implementation
 
                         { strip leading 0's in iso mode }
                         if (([m_iso,m_extpas]*current_settings.modeswitches)<>[]) then
-                          while pattern[1]='0' do
+                          while (length(pattern)>1) and (pattern[1]='0') do
                             delete(pattern,1,1);
 
                         searchsym(pattern,srsym,srsymtable);
@@ -1185,6 +1195,8 @@ implementation
                              if not(m_non_local_goto in current_settings.modeswitches) then
                                Message(parser_e_goto_outside_proc);
                              include(current_procinfo.flags,pi_has_global_goto);
+                             if is_nested_pd(current_procinfo.procdef) then
+                               current_procinfo.set_needs_parentfp(srsym.owner.symtablelevel);
                            end;
                          code:=cgotonode.create(tlabelsym(srsym));
                          tgotonode(code).labelsym:=tlabelsym(srsym);
@@ -1269,12 +1281,10 @@ implementation
                      Message(sym_e_label_already_defined);
                    if symtablestack.top.symtablelevel<>srsymtable.symtablelevel then
                      begin
-                       tlabelsym(srsym).nonlocal:=true;
                        include(current_procinfo.flags,pi_has_interproclabel);
+                       if (current_procinfo.procdef.proctypeoption in [potype_unitinit,potype_unitfinalize]) then
+                         Message(sym_e_interprocgoto_into_init_final_code_not_allowed);
                      end;
-                   if tlabelsym(srsym).nonlocal and
-                     (current_procinfo.procdef.proctypeoption in [potype_unitinit,potype_unitfinalize]) then
-                     Message(sym_e_interprocgoto_into_init_final_code_not_allowed);
 
                    tlabelsym(srsym).defined:=true;
                    p:=clabelnode.create(nil,tlabelsym(srsym));

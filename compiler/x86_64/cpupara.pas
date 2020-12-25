@@ -1358,9 +1358,9 @@ unit cpupara;
     function tcpuparamanager.get_volatile_registers_mm(calloption : tproccalloption):tcpuregisterset;
       begin
         if x86_64_use_ms_abi(calloption) then
-          result:=[RS_XMM0..RS_XMM5]
+          result:=[RS_XMM0..RS_XMM5,RS_XMM16..RS_XMM31]
         else
-          result:=[RS_XMM0..RS_XMM15];
+          result:=[RS_XMM0..RS_XMM15,RS_XMM16..RS_XMM31];
       end;
 
 
@@ -1454,7 +1454,12 @@ unit cpupara;
             numclasses:=classify_argument(p.proccalloption,result.def,nil,vs_value,result.def.size,classes,0,False);
             { this would mean a memory return }
             if (numclasses=0) then
-              internalerror(2010021502);
+              begin
+                { we got an error before, so we just skip all the return type generation }
+                if result.def.typ=errordef then
+                  exit;
+                internalerror(2010021502);
+              end;
 
             if (numclasses > MAX_PARA_CLASSES) then
               internalerror(2010021503);

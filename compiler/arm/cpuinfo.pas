@@ -73,18 +73,16 @@ Type
       fpu_vfpv3,
       fpu_neon_vfpv3,
       fpu_vfpv3_d16,
-      fpu_fpv4_s16,
+      fpu_fpv4_s16,     { same as fpu_fpv4_sp_d32, kept for backwards compatibility }
       fpu_vfpv4,
+      fpu_fpv4_sp_d16,  { 32 registers single precision, for load/store/move they can be accessed as 16 double registers }
       fpu_neon_vfpv4
-      { when new elements added afterwards, update also fpu_vfp_last below and
-        update class procedure tarmnodeutils.InsertObjectInfo; in narmutil.pas }
+      { when new elements added afterwards, update
+        class procedure tarmnodeutils.InsertObjectInfo; in narmutil.pas }
      );
 
 Const
-   fpu_vfp_first = fpu_vfpv2;
-   fpu_vfp_last  = fpu_neon_vfpv4;
-
-  fputypestrllvm : array[tfputype] of string[14] = ('',
+  fputypestrllvm : array[tfputype] of string[15] = ('',
     '',
     '',
     '',
@@ -96,6 +94,7 @@ Const
     'fpu=vfpv3-d16',
     'fpu=vfpv4-s16',
     'fpu=vfpv4',
+    'fpu=fpv4-sp-d16',
     'fpu=neon-vfpv4'
   );
 
@@ -348,6 +347,9 @@ Type
       ct_stm32f756xe,
       ct_stm32f756xg,
 
+      ct_stm32g071rb,
+      ct_nucleog071rb,
+
       { TI - Fury Class - 64 K Flash, 16 K SRAM Devices }
       ct_lm3s1110,
       ct_lm3s1133,
@@ -570,7 +572,7 @@ Const
      'ARMV7EM'
    );
 
-   fputypestr : array[tfputype] of string[10] = (
+   fputypestr : array[tfputype] of string[11] = (
      'NONE',
      'SOFT',
      'LIBGCC',
@@ -583,6 +585,7 @@ Const
      'VFPV3_D16',
      'FPV4_S16',
      'VFPV4',
+     'FPV4_SP_D16',
      'NEON_VFPV4'
    );
 
@@ -819,8 +822,8 @@ Const
       (controllertypestr:'STM32F401RD';     controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00060000; srambase:$20000000; sramsize:$00018000),
       (controllertypestr:'STM32F401VD';     controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00060000; srambase:$20000000; sramsize:$00018000),
       (controllertypestr:'STM32F401CE';     controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
-      (controllertypestr:'STM32F401RE';     controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
-      (controllertypestr:'NUCLEOF401RE';    controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
+      (controllertypestr:'STM32F401RE';     controllerunitstr:'STM32F401XE';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
+      (controllertypestr:'NUCLEOF401RE';    controllerunitstr:'STM32F401XE';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
       (controllertypestr:'STM32F401VE';     controllerunitstr:'STM32F401XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20000000; sramsize:$00018000),
       (controllertypestr:'STM32F407VG';     controllerunitstr:'STM32F407XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00100000; srambase:$20000000; sramsize:$00020000),
       (controllertypestr:'DISCOVERYF407VG'; controllerunitstr:'STM32F407XX';      cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00100000; srambase:$20000000; sramsize:$00020000),
@@ -869,6 +872,9 @@ Const
       (controllertypestr:'STM32F746XG';     controllerunitstr:'STM32F746';        cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00100000; srambase:$20010000; sramsize:$00040000),
       (controllertypestr:'STM32F756XE';     controllerunitstr:'STM32F756';        cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00080000; srambase:$20010000; sramsize:$00040000),
       (controllertypestr:'STM32F756XG';     controllerunitstr:'STM32F756';        cputype:cpu_armv7em; fputype:fpu_soft; flashbase:$08000000; flashsize:$00100000; srambase:$20010000; sramsize:$00040000),
+
+      (controllertypestr:'STM32G071RB'         ; controllerunitstr:'STM32G071XX'         ; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00009000),
+      (controllertypestr:'NUCLEOG071RB'        ; controllerunitstr:'STM32G071XX'         ; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00009000),
 
       (controllertypestr:'LM3S1110';	controllerunitstr:'LM3FURY';	cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00000000;	flashsize:$00010000;	srambase:$20000000;	sramsize:$00004000),
       (controllertypestr:'LM3S1133';	controllerunitstr:'LM3FURY';	cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00000000;	flashsize:$00010000;	srambase:$20000000;	sramsize:$00004000),
@@ -1071,9 +1077,9 @@ Const
    tfpuflags =
       (
         FPUARM_HAS_FPA,                { fpu is an fpa based FPU                                                               }
-        FPUARM_HAS_VFP_EXTENSION,      { fpu is a vfp extension                                                                }
+        FPUARM_HAS_VFP_EXTENSION,      { fpu is a vfp extension, it means at least single operation support                    }
         FPUARM_HAS_VFP_DOUBLE,         { vfp has double support                                                                }
-        FPUARM_HAS_VFP_SINGLE_ONLY,    { vfp has only single support, disjunct to FPUARM_HAS_VFP_DOUBLE, for error checking    }
+        FPUARM_HAS_VFP_DOUBLE_MOVLDST, { vfp has only single support, but MOV, LD, ST can be done on pairs as double           }
         FPUARM_HAS_32REGS,             { vfp has 32 regs, without this flag, 16 are assumed                                    }
         FPUARM_HAS_VMOV_CONST,         { vmov supports (some) real constants                                                   }
         FPUARM_HAS_EXCEPTION_TRAPPING, { vfp does exceptions trapping                                                          }
@@ -1105,19 +1111,20 @@ Const
      );
 
      fpu_capabilities : array[tfputype] of set of tfpuflags =
-       ( { fpu_none       } [],
-         { fpu_soft       } [],
-         { fpu_libgcc     } [],
-         { fpu_fpa        } [FPUARM_HAS_FPA],
-         { fpu_fpa10      } [FPUARM_HAS_FPA],
-         { fpu_fpa11      } [FPUARM_HAS_FPA],
-         { fpu_vfpv2      } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE],
-         { fpu_vfpv3      } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST],
-         { fpu_neon_vfpv3 } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_NEON],
-         { fpu_vfpv3_d16  } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_VMOV_CONST],
-         { fpu_fpv4_s16   } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_SINGLE_ONLY,FPUARM_HAS_VMOV_CONST],
-         { fpu_vfpv4      } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_FMA],
-         { fpu_neon_vfpv4 } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_NEON,FPUARM_HAS_FMA]
+       ( { fpu_none         } [],
+         { fpu_soft         } [],
+         { fpu_libgcc       } [],
+         { fpu_fpa          } [FPUARM_HAS_FPA],
+         { fpu_fpa10        } [FPUARM_HAS_FPA],
+         { fpu_fpa11        } [FPUARM_HAS_FPA],
+         { fpu_vfpv2        } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE],
+         { fpu_vfpv3        } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST],
+         { fpu_neon_vfpv3   } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_NEON],
+         { fpu_vfpv3_d16    } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_VMOV_CONST],
+         { fpu_fpv4_s16     } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_32REGS,FPUARM_HAS_VFP_DOUBLE_MOVLDST,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_FMA],
+         { fpu_vfpv4        } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_FMA],
+         { fpu_fpv4_sp_d16  } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_32REGS,FPUARM_HAS_VFP_DOUBLE_MOVLDST,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_FMA],
+         { fpu_neon_vfpv4   } [FPUARM_HAS_VFP_EXTENSION,FPUARM_HAS_VFP_DOUBLE,FPUARM_HAS_32REGS,FPUARM_HAS_VMOV_CONST,FPUARM_HAS_NEON,FPUARM_HAS_FMA]
        );
 
    { contains all CPU supporting any kind of thumb instruction set }

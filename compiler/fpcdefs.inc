@@ -2,7 +2,9 @@
 {$asmmode default}
 {$H-}
 {$goto on}
-{$inline on}
+{$ifndef DISABLE_INLINE}
+  {$inline on}
+{$endif}
 {$interfaces corba}
 
 { This reduces the memory requirements a lot }
@@ -242,6 +244,10 @@
   {$endif mips}
 {$endif mipsel}
 
+{$ifdef mips64el}
+  {$define mips}
+  {$define mips64}
+{$endif mipsel}
 
 {$ifdef mips}
   {$ifndef mips64}
@@ -249,7 +255,9 @@
     {$define cpu32bitalu}
     {$define cpu32bitaddr}
   {$else}
-    {$error mips64 not yet supported}
+    {$define cpu64bit}
+    {$define cpu64bitalu}
+    {$define cpu64bitaddr}
   {$endif}
   {$define cpuflags} { Flags are emulated }
   {$define cputargethasfixedstack}
@@ -295,6 +303,19 @@
   {$define cpurequiresproperalignment}
 {$endif riscv32}
 
+{$ifdef z80}
+  {$define cpu8bit}
+  {$define cpu16bitaddr}
+  {$define cpu8bitalu}
+  {$define cpufpemu}
+  {$define cpuflags}
+  {$define cpunofpu}
+  {$define cpunodefaultint}
+  {$define cpuneedsdivhelper}
+  {$define cpuneedsmulhelper}
+  {$define cpucapabilities}
+{$endif z80}
+
 {$ifdef riscv64}
   {$define riscv}
   {$define cpu64bit}
@@ -307,6 +328,19 @@
   {$define cpucapabilities}
   {$define cpurequiresproperalignment}
 {$endif riscv64}
+
+{$ifdef xtensa}
+  {$define cpu32bit}
+  {$define cpu32bitaddr}
+  {$define cpu32bitalu}
+  {$define cpufpemu}
+  {$define cpuflags} { xtensa has a boolean extension }
+  {$define cputargethasfixedstack}
+  {$define cpuneedsdivhelper}
+  {$define cpucapabilities}
+  {$define cpurequiresproperalignment}
+  {$define cpufloatintregmov}
+{$endif xtensa}
 
 { Stabs is not officially supported on 64 bit targets by gdb, except on Mac OS X
   (but there we don't support it)
@@ -321,6 +355,11 @@
 {$ifndef FPC_SOFT_FPUX80}
 {$error Cross-compiling from systems without support for an 80 bit extended floating point type to i386 is not yet supported at this time }
 {$endif}
+{$endif}
+
+{ when compiling with an LLVM-based compiler, default to LLVM unless -dNOLLVM is specified }
+{$if defined(CPULLVM) and not defined(NOLLVM)}
+{$define LLVM}
 {$endif}
 
 { llvm backends partially use other backends for parameter info calculation,

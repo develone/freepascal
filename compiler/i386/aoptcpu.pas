@@ -139,8 +139,20 @@ unit aoptcpu;
               case taicpu(p).opcode Of
                 A_AND:
                   Result:=OptPass1And(p);
+                A_IMUL:
+                  Result:=OptPass1Imul(p);
                 A_CMP:
                   Result:=OptPass1Cmp(p);
+                A_VPXORD,
+                A_VPXORQ,
+                A_VXORPS,
+                A_VXORPD,
+                A_VPXOR:
+                  Result:=OptPass1VPXor(p);
+                A_XORPS,
+                A_XORPD,
+                A_PXOR:
+                  Result:=OptPass1PXor(p);
                 A_FLD:
                   Result:=OptPass1FLD(p);
                 A_FSTP,A_FISTP:
@@ -193,9 +205,7 @@ unit aoptcpu;
                 A_VANDPD,
                 A_VANDPS,
                 A_VORPD,
-                A_VORPS,
-                A_VXORPD,
-                A_VXORPS:
+                A_VORPS:
                   Result:=OptPass1VOP(p);
                 A_MULSD,
                 A_MULSS,
@@ -228,6 +238,8 @@ unit aoptcpu;
               if InsContainsSegRef(taicpu(p)) then
                 exit;
               case taicpu(p).opcode Of
+                A_ADD:
+                  Result:=OptPass2ADD(p);
                 A_Jcc:
                   Result:=OptPass2Jcc(p);
                 A_Lea:
@@ -324,6 +336,8 @@ unit aoptcpu;
                    end;
                 A_TEST, A_OR:
                   Result:=PostPeepholeOptTestOr(p);
+                A_AND:
+                  Result:=PostPeepholeOptAnd(p);
                 A_MOVSX:
                   Result:=PostPeepholeOptMOVSX(p);
                 else

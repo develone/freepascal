@@ -723,7 +723,7 @@ implementation
           R_MMREGISTER :
             result:=taicpu.op_reg_ref(A_VLDR,r,ref);
           else
-            internalerror(200401041);
+            internalerror(2004010415);
         end;
       end;
 
@@ -741,7 +741,7 @@ implementation
           R_MMREGISTER :
             result:=taicpu.op_reg_ref(A_VSTR,r,ref);
           else
-            internalerror(200401041);
+            internalerror(2004010416);
         end;
       end;
 
@@ -866,6 +866,7 @@ implementation
             A_NEG,
             A_VABS,A_VADD,A_VCVT,A_VDIV,A_VLDR,A_VMOV,A_VMUL,A_VNEG,A_VSQRT,A_VSUB,
             A_VEOR,
+            A_VMRS,A_VMSR,
             A_MRS,A_MSR:
               if opnr=0 then
                 result:=operand_write
@@ -922,7 +923,10 @@ implementation
             A_STREX:
               result:=operand_write;
             else
-              internalerror(200403151);
+              begin
+                writeln(opcode);
+                internalerror(2004031502);
+              end;
           end;
       end;
 
@@ -2229,6 +2233,7 @@ implementation
             { fpu_neon_vfpv3 } IF_VFPv2 or IF_VFPv3 or IF_NEON,
             { fpu_vfpv3_d16  } IF_VFPv2 or IF_VFPv3,
             { fpu_fpv4_s16   } IF_NONE,
+            { fpu_vfpv4      } IF_VFPv2 or IF_VFPv3 or IF_VFPv4,
             { fpu_vfpv4      } IF_VFPv2 or IF_VFPv3 or IF_VFPv4,
             { fpu_neon_vfpv4 } IF_VFPv2 or IF_VFPv3 or IF_VFPv4 or IF_NEON
           );

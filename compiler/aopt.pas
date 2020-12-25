@@ -192,7 +192,6 @@ Unit aopt;
                       End
                     else if tai_regalloc(p).ratype=ra_dealloc then
                       Begin
-                        ExcludeRegFromUsedRegs(tai_regalloc(p).Reg,Regs);
                         hp1 := p;
                         hp2 := nil;
                         While Not(assigned(FindRegAlloc(tai_regalloc(p).Reg, tai(hp1.Next)))) And
@@ -233,7 +232,9 @@ Unit aopt;
                             AsmL.remove(p);
                             p.free;
                             p := hp1;
-                          end;
+                          end
+                        else
+                          ExcludeRegFromUsedRegs(tai_regalloc(p).Reg,Regs);
                       End
                   End
                 else
@@ -272,28 +273,16 @@ Unit aopt;
     Procedure TAsmOptimizer.Optimize;
       Var
         HP: tai;
-        pass: longint;
       Begin
-        pass:=0;
         BlockStart := tai(AsmL.First);
         pass_1;
         While Assigned(BlockStart) Do
           Begin
             if (cs_opt_peephole in current_settings.optimizerswitches) then
               begin
-                if pass = 0 then
-                  PrePeepHoleOpts;
-                { Peephole optimizations }
+                PrePeepHoleOpts;
                 PeepHoleOptPass1;
-                { Only perform them twice in the first pass }
-                if pass = 0 then
-                  PeepHoleOptPass1;
-              end;
-            { more peephole optimizations }
-            if (cs_opt_peephole in current_settings.optimizerswitches) then
-              begin
                 PeepHoleOptPass2;
-                { if pass = last_pass then }
                 PostPeepHoleOpts;
               end;
             { free memory }

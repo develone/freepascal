@@ -229,7 +229,11 @@ interface
          cs_link_pre_binutils_2_19,
          cs_link_vlink,
          { disable LTO for the system unit (needed to work around linker bugs on macOS) }
-         cs_lto_nosystem
+         cs_lto_nosystem,
+         cs_assemble_on_target,
+         { use a memory model which allows large data structures, e.g. > 2 GB static data on x86-64 targets
+           this not supported on all OSes }
+         cs_large
        );
        tglobalswitches = set of tglobalswitch;
 
@@ -338,11 +342,12 @@ interface
          }
          cs_opt_dead_values,
          { compiler checks for empty procedures/methods and removes calls to them if possible }
-         cs_opt_remove_emtpy_proc,
+         cs_opt_remove_empty_proc,
          cs_opt_constant_propagate,
          cs_opt_dead_store_eliminate,
          cs_opt_forcenostackframe,
-         cs_opt_use_load_modify_store
+         cs_opt_use_load_modify_store,
+         cs_opt_unused_para
        );
        toptimizerswitches = set of toptimizerswitch;
 
@@ -352,6 +357,12 @@ interface
          cs_wpo_symbol_liveness
        );
        twpoptimizerswitches = set of twpoptimizerswitch;
+
+       { platform triplet style }
+       ttripletstyle = (
+         triplet_llvm
+         { , triple_gnu }
+       );
 
        { module flags (extra unit flags not in ppu header) }
        tmoduleflag = (
@@ -400,7 +411,8 @@ interface
          'DFA','STRENGTH','SCHEDULE','AUTOINLINE','USEEBP','USERBP',
          'ORDERFIELDS','FASTMATH','DEADVALUES','REMOVEEMPTYPROCS',
          'CONSTPROP',
-         'DEADSTORE','FORCENOSTACKFRAME','USELOADMODIFYSTORE'
+         'DEADSTORE','FORCENOSTACKFRAME','USELOADMODIFYSTORE',
+         'UNUSEDPARA'
        );
        WPOptimizerSwitchStr : array [twpoptimizerswitch] of string[14] = (
          'DEVIRTCALLS','OPTVMTS','SYMBOLLIVENESS'
@@ -425,7 +437,7 @@ interface
 
        { switches being applied to all CPUs at the given level }
        genericlevel1optimizerswitches = [cs_opt_level1,cs_opt_peephole];
-       genericlevel2optimizerswitches = [cs_opt_level2,cs_opt_remove_emtpy_proc];
+       genericlevel2optimizerswitches = [cs_opt_level2,cs_opt_remove_empty_proc,cs_opt_unused_para];
        genericlevel3optimizerswitches = [cs_opt_level3,cs_opt_constant_propagate,cs_opt_nodedfa{$ifndef llvm},cs_opt_use_load_modify_store{$endif},cs_opt_loopunroll];
        genericlevel4optimizerswitches = [cs_opt_level4,cs_opt_reorder_fields,cs_opt_dead_values,cs_opt_fastmath];
 
@@ -748,7 +760,9 @@ interface
          { subroutine needs to load and maintain a tls register }
          pi_needs_tls,
          { subroutine uses get_frame }
-         pi_uses_get_frame
+         pi_uses_get_frame,
+         { x86 only: subroutine uses ymm registers, requires vzeroupper call }
+         pi_uses_ymm
        );
        tprocinfoflags=set of tprocinfoflag;
 
@@ -777,7 +791,11 @@ interface
       TRADirection = (rad_forward, rad_backwards, rad_backwards_reinit);
 
     type
+{$ifndef symansistr}
       TIDString = string[maxidlen];
+{$else}
+      TIDString = TSymStr;
+{$endif}
 
       tnormalset = set of byte; { 256 elements set }
       pnormalset = ^tnormalset;

@@ -350,11 +350,11 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
             { carry-over to the next element? }
             if (shiftcount<0) then
               begin
-                if shiftcount>=AIntBits then
+                if shiftcount>=-AIntBits then
                   bp.nextval:=(value and ((aword(1) shl (-shiftcount))-1)) shl
                               (AIntBits+shiftcount)
                 else
-                  bp.nextval:=0
+                  bp.nextval:=0;
               end
           end
         else
@@ -860,7 +860,7 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
                 end
               else
                 begin
-                  IncompatibleTypes(node.resultdef, def);
+                  Message(parser_e_illegal_expression);
                   datadef:=carraydef.getreusable(cansichartype,1);
                 end;
               ftcb.finish_internal_data_builder(datatcb,ll,datadef,varalign);
@@ -909,7 +909,7 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
                    end;
                 end
               else
-                IncompatibleTypes(node.resultdef, def);
+                Message(parser_e_illegal_expression);
           end
         else
           if (node.nodetype=addrn) or
@@ -1321,7 +1321,7 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
                       begin
                         inserttypeconv(n,cunicodestringtype);
                         if n.nodetype<>stringconstn then
-                          internalerror(2010033003);
+                          internalerror(2010033009);
                         ca:=pointer(pcompilerwidestring(tstringconstnode(n).value_str)^.data)
                       end;
                     else
@@ -1357,13 +1357,13 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
                       begin
                         inserttypeconv(n,cansichartype);
                         if not is_constcharnode(n) then
-                          internalerror(2010033001);
+                          internalerror(2010033006);
                         ch[0]:=chr(tordconstnode(n).value.uvalue and $ff);
                       end;
                     2:
                       widechar(ch):=widechar(tordconstnode(n).value.uvalue and $ffff);
                     else
-                      internalerror(2010033002);
+                      internalerror(2010033008);
                   end;
                   ca:=@ch;
                   len:=1;
@@ -1456,7 +1456,7 @@ function get_next_varsym(def: tabstractrecorddef; const SymList:TFPHashObjectLis
         { get the address of the procedure, except if it's a C-block (then we
           we will end up with a record that represents the C-block) }
         if not is_block(def) then
-          procaddrdef:=cprocvardef.getreusableprocaddr(def)
+          procaddrdef:=cprocvardef.getreusableprocaddr(def,pc_address_only)
         else
           procaddrdef:=def;
         ftcb.queue_init(procaddrdef);

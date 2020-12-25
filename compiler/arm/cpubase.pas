@@ -44,10 +44,6 @@ unit cpubase;
 
     type
       TAsmOp= {$i armop.inc}
-      {This is a bit of a hack, because there are more than 256 ARM Assembly Ops
-       But FPC currently can't handle more than 256 elements in a set.}
-      TCommonAsmOps = Set of A_None .. A_UADD16;
-
       { This should define the array of instructions as string }
       op2strtable=array[tasmop] of string[11];
 
@@ -56,6 +52,14 @@ unit cpubase;
       firstop = low(tasmop);
       { Last value of opcode enumeration  }
       lastop  = high(tasmop);
+      { Last value of opcode for TCommonAsmOps set below  }
+      LastCommonAsmOp = A_UADD16;
+
+
+    type
+      {This is a bit of a hack, because there are more than 256 ARM Assembly Ops
+       But FPC currently can't handle more than 256 elements in a set.}
+      TCommonAsmOps = Set of A_None .. LastCommonAsmOp;
 
 {*****************************************************************************
                                   Registers
@@ -446,7 +450,7 @@ unit cpubase;
             begin
               case getsubreg(reg) of
                 R_SUBFD,
-                R_SUBWHOLE:
+                R_SUBMMWHOLE:
                   result:=OS_F64;
                 R_SUBFS:
                   result:=OS_F32;
@@ -635,6 +639,9 @@ unit cpubase;
           end;
       end;
     
+{$push}
+{ Disable range and overflow checking here }
+{$R-}{$Q-}        
     function is_continuous_mask(d : aword;var lsb, width: byte) : boolean;
       var
         msb : byte;
@@ -643,9 +650,9 @@ unit cpubase;
         msb:=BsrDword(d);
         
         width:=msb-lsb+1;
-        
         result:=(lsb<>255) and (msb<>255) and (aword(((1 shl (msb-lsb+1))-1) shl lsb) = d);
       end;
+{$pop}
 
 
     function split_into_shifter_const(value : aint;var imm1: dword; var imm2: dword) : boolean;

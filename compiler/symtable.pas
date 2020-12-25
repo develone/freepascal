@@ -125,7 +125,6 @@ interface
           procedure insertdef(def:TDefEntry);override;
           function is_packed: boolean;
           function has_single_field(out def:tdef): boolean;
-          function get_unit_symtable: tsymtable;
           { collects all management operators of the specified type in list (which
             is not cleared); the entries are copies and thus must be freed by the
             caller }
@@ -1677,14 +1676,6 @@ implementation
         until false;
       end;
 
-    function tabstractrecordsymtable.get_unit_symtable: tsymtable;
-      begin
-        result:=defowner.owner;
-        while assigned(result) and (result.symtabletype in [ObjectSymtable,recordsymtable]) do
-          result:=result.defowner.owner;
-      end;
-
-
     procedure tabstractrecordsymtable.do_get_managementoperator_offset_list(data:tobject;arg:pointer);
       var
         sym : tsym absolute data;
@@ -2561,6 +2552,8 @@ implementation
                 HideSym(hsym);
                 tstaticvarsym(sym).isoindex:=tprogramparasym(hsym).isoindex;
               end
+            else if (m_iso in current_settings.modeswitches) and (hsym.typ=unitsym) then
+              HideSym(hsym)
             else
               DuplicateSym(hashedid,sym,hsym,false);
             result:=true;
@@ -2637,7 +2630,7 @@ implementation
           begin
             { first check the class... }
             if ([oo_has_class_constructor,oo_has_class_destructor] * tabstractrecorddef(p).objectoptions <> []) then
-              result^:=true;;
+              result^:=true;
             { ... and then also check all subclasses }
             if not result^ then
               tabstractrecorddef(p).symtable.deflist.foreachcall(@CheckForClassConDestructors,arg);
@@ -3614,6 +3607,10 @@ implementation
         formalnameptr,
         foundnameptr: pshortstring;
       begin
+        while pd.is_unique_objpasdef do
+          begin
+            pd:=pd.childof;
+          end;
         { not a formal definition -> return it }
         if not(oo_is_formal in pd.objectoptions) then
           begin
@@ -3972,11 +3969,21 @@ implementation
         currpd,
         bestpd : tprocdef;
         stackitem : psymtablestackitem;
+        shortstringcount : longint;
+        isexplicit,
+        checkshortstring : boolean;
       begin
         hashedid.id:=overloaded_names[assignment_type];
         besteq:=te_incompatible;
         bestpd:=nil;
         stackitem:=symtablestack.stack;
+        { special handling for assignments to shortstrings with a specific length:
+          - if we get an operator to ShortString we use that
+          - if we get only a single String[x] operator we use that
+          - otherwise it's a nogo }
+        isexplicit:=assignment_type=_OP_EXPLICIT;
+        shortstringcount:=0;
+        checkshortstring:=not isexplicit and is_shortstring(to_def) and (tstringdef(to_def).len<>255);
         while assigned(stackitem) do
           begin
             sym:=Tprocsym(stackitem^.symtable.FindWithHash(hashedid));
@@ -3986,17 +3993,36 @@ implementation
                   internalerror(200402031);
                 { if the source type is an alias then this is only the second choice,
                   if you mess with this code, check tw4093 }
-                currpd:=sym.find_procdef_assignment_operator(from_def,to_def,curreq);
+                currpd:=sym.find_procdef_assignment_operator(from_def,to_def,curreq,isexplicit);
+                { we found a ShortString overload, use that and be done }
+                if checkshortstring and
+                    assigned(currpd) and
+                    is_shortstring(currpd.returndef) and
+                    (tstringdef(currpd.returndef).len=255) then
+                  begin
+                    besteq:=curreq;
+                    bestpd:=currpd;
+                    break;
+                  end;
+                { independently of the operator being better count if we encountered
+                  multpile String[x] operators }
+                if checkshortstring and assigned(currpd) and is_shortstring(currpd.returndef) then
+                  inc(shortstringcount);
                 if curreq>besteq then
                   begin
                     besteq:=curreq;
                     bestpd:=currpd;
-                    if (besteq=te_exact) then
+                    { don't stop searching if we have a String[x] operator cause
+                      we might find a ShortString one or multiple ones (which
+                      leads to no operator use) }
+                    if (besteq=te_exact) and not checkshortstring then
                       break;
                   end;
               end;
             stackitem:=stackitem^.next;
           end;
+        if checkshortstring and (shortstringcount>1) then
+          bestpd:=nil;
         result:=bestpd;
       end;
 

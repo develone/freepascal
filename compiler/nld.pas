@@ -357,8 +357,7 @@ implementation
                    if assigned(left) then
                      internalerror(200309289);
                    left:=cloadparentfpnode.create(tprocdef(symtable.defowner),lpf_forload);
-                   { we can't inline the referenced parent procedure }
-                   include(tprocdef(symtable.defowner).implprocoptions,pio_nested_access);
+                   current_procinfo.set_needs_parentfp(tprocdef(symtable.defowner).parast.symtablelevel);
                    { reference in nested procedures, variable needs to be in memory }
                    { and behaves as if its address escapes its parent block         }
                    make_not_regable(self,[ra_different_scope]);
@@ -390,6 +389,9 @@ implementation
                  typeconvn need this as resultdef so they know
                  that the address needs to be returned }
                resultdef:=fprocdef;
+
+               if is_nested_pd(fprocdef) and is_nested_pd(current_procinfo.procdef) then
+                 current_procinfo.set_needs_parentfp(tprocdef(fprocdef.owner.defowner).parast.symtablelevel);
 
                { process methodpointer/framepointer }
                if assigned(left) then
@@ -430,8 +432,8 @@ implementation
               ;
             constsym:
               begin
-                 if tconstsym(symtableentry).consttyp=constresourcestring then
-                   expectloc:=LOC_CREFERENCE;
+                if tconstsym(symtableentry).consttyp=constresourcestring then
+                  expectloc:=LOC_CREFERENCE;
               end;
             staticvarsym,
             localvarsym,
@@ -453,25 +455,25 @@ implementation
                   end;
               end;
             procsym :
-                begin
-                   { initialise left for nested procs if necessary }
-                   if (m_nested_procvars in current_settings.modeswitches) then
-                     setprocdef(fprocdef);
-                   { method pointer or nested proc ? }
-                   if assigned(left) then
-                     begin
-                        expectloc:=LOC_CREGISTER;
-                        firstpass(left);
-                     end;
-                end;
-           labelsym :
-             begin
-               if not assigned(tlabelsym(symtableentry).asmblocklabel) and
-                  not assigned(tlabelsym(symtableentry).code) then
-                 Message(parser_e_label_outside_proc);
-             end
-           else
-             internalerror(200104143);
+              begin
+                { initialise left for nested procs if necessary }
+                if (m_nested_procvars in current_settings.modeswitches) then
+                  setprocdef(fprocdef);
+                { method pointer or nested proc ? }
+                if assigned(left) then
+                  begin
+                     expectloc:=LOC_CREGISTER;
+                     firstpass(left);
+                  end;
+              end;
+            labelsym :
+              begin
+                if not assigned(tlabelsym(symtableentry).asmblocklabel) and
+                   not assigned(tlabelsym(symtableentry).code) then
+                  Message(parser_e_label_outside_proc);
+              end
+            else
+              internalerror(200104143);
          end;
       end;
 
@@ -751,6 +753,10 @@ implementation
                 and (use_vectorfpu(left.resultdef) and
                      use_vectorfpu(right.resultdef) and
                      (tfloatdef(left.resultdef).floattype=tfloatdef(right.resultdef).floattype))
+{$endif arm}
+{$ifdef xtensa}
+                and not((FPUXTENSA_SINGLE in fpu_capabilities[current_settings.fputype]) xor
+                  (FPUXTENSA_DOUBLE in fpu_capabilities[current_settings.fputype]))
 {$endif}
         then
           begin
@@ -1247,6 +1253,8 @@ implementation
         if do_variant then
           tarraydef(resultdef).elementdef:=search_system_type('TVARREC').typedef;
         expectloc:=LOC_CREFERENCE;
+
+        inc(current_procinfo.estimatedtempsize,(tarraydef(resultdef).highrange+1)*tarraydef(resultdef).elementdef.size);
       end;
 
 

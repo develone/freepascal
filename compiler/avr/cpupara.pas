@@ -58,7 +58,7 @@ unit cpupara;
     function tcpuparamanager.get_volatile_registers_int(calloption : tproccalloption):tcpuregisterset;
       begin
         if CPUAVR_16_REGS in cpu_capabilities[current_settings.cputype] then
-          result:=VOLATILE_INTREGISTERS-[RS_R18,RS_R19]
+          result:=VOLATILE_INTREGISTERS-[RS_R0,RS_R1,RS_R18,RS_R19]
         else
           result:=VOLATILE_INTREGISTERS;
       end;
@@ -170,7 +170,7 @@ unit cpupara;
             result:=not(def.size in [1,2,4]);
           }
           else
-            if (def.size > 8) then
+            if (def.size > 8) or ((CPUAVR_16_REGS in cpu_capabilities[current_settings.cputype]) and (def.size > 4)) then
               result:=true
             else
               result:=inherited ret_in_param(def,pd);
@@ -343,7 +343,8 @@ unit cpupara;
                  case loc of
                     LOC_REGISTER:
                       begin
-                        if nextintreg>=RS_R8 then
+                        if ((nextintreg>=RS_R8) and not(CPUAVR_16_REGS in cpu_capabilities[current_settings.cputype])) or
+                          (nextintreg>=RS_R20) then
                           begin
                             paraloc^.loc:=LOC_REGISTER;
                             paraloc^.size:=OS_8;
@@ -554,7 +555,7 @@ unit cpupara;
               end;
           end
         else
-          internalerror(200410231);
+          internalerror(2004102305);
       end;
 
 begin

@@ -28,9 +28,11 @@
   {$endif}
 {$endif}
 
-{$if defined(cpupowerpc) or defined(cpupowerpc64) or defined(cpui386) or
+{$if defined(cpupowerpc) or defined(cpupowerpc64) or
+  defined(cpui386) or
+  defined(cpum68k) or
   (defined(cpuarm) and defined(FPC_ABI_EABI))}
-  {$DEFINE has_ugetrlimit}
+  {$define HAS_UGETRLIMIT}
 {$endif}
 
 {$if (defined(cpuarm) and defined(FPC_ABI_EABI))}
@@ -98,6 +100,14 @@
   {$define generic_linux_syscalls}
   {$undef usestime}
 {$endif cpuriscv64}
+
+{$ifdef cpuxtensa}
+  {$define FPC_USEGETTIMEOFDAY}
+  {$define MMAP2}
+  {$define WAIT4}
+  {$undef usestime}
+{$endif cpuxtensa}
+
 
 {$ifdef android}
   {$define generic_linux_syscalls}
