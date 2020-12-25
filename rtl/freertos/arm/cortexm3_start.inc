@@ -9,9 +9,80 @@ var
 
 procedure Pascalmain; external name 'PASCALMAIN';
 
+procedure _NonMaskableInt_Handler; assembler; nostackframe; public name '_NonMaskableInt_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _HardFault_Handler; assembler; nostackframe; public name '_HardFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _MemoryManagement_Handler; assembler; nostackframe; public name '_MemoryManagement_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _BusFault_Handler; assembler; nostackframe; public name '_BusFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _UsageFault_Handler; assembler; nostackframe; public name '_UsageFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVC_Handler; assembler; nostackframe; public name '_SVC_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVCall_Handler; assembler; nostackframe; public name '_SVCall_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _DebugMonitor_Handler; assembler; nostackframe; public name '_DebugMonitor_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _PendSV_Handler; assembler; nostackframe; public name '_PendSV_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SysTick_Handler; assembler; nostackframe; public name '_SysTick_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
 procedure HaltProc; assembler; nostackframe; public name'_haltproc';
 asm
 .Lloop:
+   bkpt
    b .Lloop
 end;
 

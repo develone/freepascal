@@ -9,9 +9,45 @@ var
 
 procedure Pascalmain; external name 'PASCALMAIN';
 
+procedure _NonMaskableInt_Handler; assembler; nostackframe; public name '_NonMaskableInt_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _HardFault_Handler; assembler; nostackframe; public name '_HardFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVC_Handler; assembler; nostackframe; public name '_SVC_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _PendSV_Handler; assembler; nostackframe; public name '_PendSV_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SysTick_Handler; assembler; nostackframe; public name '_SysTick_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
 procedure HaltProc; assembler; nostackframe; public name'_haltproc';
 asm
 .Lloop:
+   bkpt
    b .Lloop
 end;
 

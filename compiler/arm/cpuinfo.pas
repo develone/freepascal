@@ -497,8 +497,15 @@ Type
 
       { Atmel }
       ct_sam3x8e,
+      ct_samd51g19a,
+      ct_samd51j19a,
+      ct_samd51p19a,
       ct_arduino_due,
       ct_flip_n_click,
+      ct_wio_terminal,
+      ct_feather_m4,
+      ct_itsybitsy_m4,
+      ct_metro_m4,
       
       { Nordic Semiconductor }
       ct_nrf51422_xxaa,
@@ -1021,8 +1028,16 @@ Const
 
       { Atmel }
       (controllertypestr:'ATSAM3X8E';     controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
+      (controllertypestr:'SAMD51G19A'    ;controllerunitstr:'SAMD51G19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'SAMD51J19A'    ;controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'SAMD51P19A'    ;controllerunitstr:'SAMD51P19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+
       (controllertypestr:'ARDUINO_DUE';   controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
       (controllertypestr:'FLIP_N_CLICK';  controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
+      (controllertypestr:'WIO_TERMINAL'  ;controllerunitstr:'SAMD51P19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'FEATHER_M4';    controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'ITSYBITSY_M4'  ;controllerunitstr:'SAMD51G19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'METRO_M4'      ;controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
       
       { Nordic Semiconductor }
       (controllertypestr:'NRF51422_XXAA'; controllerunitstr:'NRF51'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$00000000; flashsize:$00040000;      srambase:$20000000; sramsize:$00004000),

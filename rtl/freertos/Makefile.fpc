@@ -73,11 +73,11 @@ CPU_SPECIFIC_COMMON_UNITS=
 ifeq ($(ARCH),arm)
 CPU_SPECIFIC_COMMON_UNITS=sysutils math classes fgl macpas typinfo types rtlconsts getopts lineinfo
 ifeq ($(SUBARCH),armv7m)
-CPU_UNITS=stm32f103xe cortexm3 cortexm4 # thumb2_bare
+CPU_UNITS=stm32f103xb # thumb2_bare
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7em)
-CPU_UNITS=stm32f401xe cortexm3 cortexm4 cortexm7 # thumb2_bare
+CPU_UNITS=stm32f401xe samd51g19a samd51j19a samd51p19a # thumb2_bare
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv4t)
@@ -89,7 +89,7 @@ CPU_UNITS=lpc21x4 at91sam7x256 sc32442b
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv6m)
-CPU_UNITS=stm32g071xx cortexm0
+CPU_UNITS=stm32g071xx
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7a)
