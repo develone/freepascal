@@ -83,15 +83,13 @@ asm
   cmp r1,r2
   bls .Lzeroloop
 
-{$ifdef REMAP_VECTTAB}
   ldr r0, .Lvtor
   ldr r1, .Ltext_start
   str r1, [r0]
-{$endif REMAP_VECTTAB}
 
   bl PASCALMAIN
   b HaltProc
-
+  .align 4
 .L_bss_start:
   .long _bss_start
 .L_bss_end:
@@ -102,10 +100,8 @@ asm
   .long _data
 .L_edata:
   .long _edata
-{$ifdef REMAP_VECTTAB}
 .Lvtor:
   .long 0xE000ED08
 .Ltext_start:
   .long _text_start
-{$endif REMAP_VECTTAB}
 end;
