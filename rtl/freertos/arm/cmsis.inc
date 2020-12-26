@@ -1,3 +1,9 @@
+{$IF NOT DEFINED(INTERFACE) AND NOT DEFINED(IMPLEMENTATION)}
+unit cmsis;
+
+interface
+
+{$ENDIF}
 {$if defined(INTERFACE)}
   {$if defined(CPUARMV6M)}
     type
@@ -275,8 +281,6 @@
       SCB_BASE =       SCS_BASE + $0D00;
       CoreDebug_BASE = SCS_BASE + $0DF0;
       TPI_BASE =       $E0040000;
-    type
-      TITM_Port = 0..31;
     var
       ITM : TITM_Registers absolute ITM_BASE;
       DWT : TDWT_Registers absolute DWT_BASE;
@@ -286,13 +290,32 @@
       SCB : TSCB_Registers absolute SCB_BASE;
       SysTick : TSysTick_Registers absolute SysTick_BASE;
   {$endif}
+
+  {$if not defined(__CORTEXM0)}
+  type
+    TITM_Port = 0..31;
+  procedure ITM_SendData(Port: TITM_Port; Data: longword);
+  {$endif}
+  procedure NVIC_SetPriority(IRQn: TIRQn_Enum; priority: longword);
+  function  NVIC_GetPriority(IRQn: TIRQn_Enum): longword;
+  procedure NVIC_EnableIRQ(IRQn: TIRQn_Enum);
+  procedure NVIC_DisableIRQ(IRQn: TIRQn_Enum);
+  function  NVIC_GetPendingIRQ(IRQn: TIRQn_Enum): longword;
+  procedure NVIC_SetPendingIRQ(IRQn: TIRQn_Enum);
+  procedure NVIC_ClearPendingIRQ(IRQn: TIRQn_Enum);
+
 {$endif}
 
+{$IF NOT DEFINED(INTERFACE) AND NOT DEFINED(IMPLEMENTATION)}
+implementation
+{$ENDIF}
+
 {$if defined(IMPLEMENTATION)}
+  {$if not defined(__CORTEXM0)}
   procedure ITM_SendData(Port: TITM_Port; Data: longword);
   const
-   CoreDebug_DEMCR_TRCENA = $01000000;
-   ITM_TCR_ITMENA   = $00000001;
+    CoreDebug_DEMCR_TRCENA = $01000000;
+    ITM_TCR_ITMENA   = $00000001;
   begin
     if ((CoreDebug.DEMCR and CoreDebug_DEMCR_TRCENA) <> 0) and
        ((ITM.TCR and ITM_TCR_ITMENA) <> 0) and
@@ -302,6 +325,7 @@
       ITM.Port[Port].u32 := Data;
     end;
   end;
+  {$endif}
 
   procedure NVIC_SetPriority(IRQn: TIRQn_Enum; priority: longword);
   begin
@@ -344,3 +368,8 @@
     NVIC.ICPR[(longInt(IRQn) shr 5)] := 1 shl (longInt(IRQn) and $1F);
   end;
 {$endif}
+
+{$IF NOT DEFINED(INTERFACE) AND NOT DEFINED(IMPLEMENTATION)}
+end.
+{$ENDIF}
+

@@ -637,6 +637,7 @@ procedure CEC_IRQHandler; external name 'CEC_IRQHandler';
 
 
 {$i cortexm0_start.inc}
+{$i cmsis.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

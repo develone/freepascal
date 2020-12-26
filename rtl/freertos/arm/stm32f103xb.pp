@@ -519,6 +519,7 @@ procedure USBWakeUp_IRQHandler; external name 'USBWakeUp_IRQHandler';
 
 
 {$i cortexm3_start.inc}
+{$i cmsis.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

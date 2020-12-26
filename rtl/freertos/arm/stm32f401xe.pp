@@ -657,8 +657,8 @@ procedure I2C3_ER_IRQHandler; external name 'I2C3_ER_IRQHandler';
 procedure FPU_IRQHandler; external name 'FPU_IRQHandler';
 procedure SPI4_IRQHandler; external name 'SPI4_IRQHandler';
 
-
 {$i cortexm4f_start.inc}
+{$i cmsis.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;
