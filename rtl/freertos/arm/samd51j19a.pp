@@ -26,32 +26,32 @@ type
     SysTick_IRQn              = -1,
     PM_IRQn                   = 0,
     MCLK_IRQn                 = 1,
-    OSCCTRL_XOSC0_IRQn        = 2,
-    OSCCTRL_XOSC1_IRQn        = 3,
-    OSCCTRL_DFLL_IRQn         = 4,
-    OSCCTRL_DPLL0_IRQn        = 5,
-    OSCCTRL_DPLL1_IRQn        = 6,
+    OSCCTRL_0_IRQn            = 2,
+    OSCCTRL_1_IRQn            = 3,
+    OSCCTRL_2_IRQn            = 4,
+    OSCCTRL_3_IRQn            = 5,
+    OSCCTRL_4_IRQn            = 6,
     OSC32KCTRL_IRQn           = 7,
-    SUPC_OTHER_IRQn           = 8,
-    SUPC_BODDET_IRQn          = 9,
+    SUPC_0_IRQn               = 8,
+    SUPC_1_IRQn               = 9,
     WDT_IRQn                  = 10,
     RTC_IRQn                  = 11,
-    EIC_EXTINT_0_IRQn         = 12,
-    EIC_EXTINT_1_IRQn         = 13,
-    EIC_EXTINT_2_IRQn         = 14,
-    EIC_EXTINT_3_IRQn         = 15,
-    EIC_EXTINT_4_IRQn         = 16,
-    EIC_EXTINT_5_IRQn         = 17,
-    EIC_EXTINT_6_IRQn         = 18,
-    EIC_EXTINT_7_IRQn         = 19,
-    EIC_EXTINT_8_IRQn         = 20,
-    EIC_EXTINT_9_IRQn         = 21,
-    EIC_EXTINT_10_IRQn        = 22,
-    EIC_EXTINT_11_IRQn        = 23,
-    EIC_EXTINT_12_IRQn        = 24,
-    EIC_EXTINT_13_IRQn        = 25,
-    EIC_EXTINT_14_IRQn        = 26,
-    EIC_EXTINT_15_IRQn        = 27,
+    EIC_0_IRQn                = 12,
+    EIC_1_IRQn                = 13,
+    EIC_2_IRQn                = 14,
+    EIC_3_IRQn                = 15,
+    EIC_4_IRQn                = 16,
+    EIC_5_IRQn                = 17,
+    EIC_6_IRQn                = 18,
+    EIC_7_IRQn                = 19,
+    EIC_8_IRQn                = 20,
+    EIC_9_IRQn                = 21,
+    EIC_10_IRQn               = 22,
+    EIC_11_IRQn               = 23,
+    EIC_12_IRQn               = 24,
+    EIC_13_IRQn               = 25,
+    EIC_14_IRQn               = 26,
+    EIC_15_IRQn               = 27,
     FREQM_IRQn                = 28,
     NVMCTRL_0_IRQn            = 29,
     NVMCTRL_1_IRQn            = 30,
@@ -59,83 +59,83 @@ type
     DMAC_1_IRQn               = 32,
     DMAC_2_IRQn               = 33,
     DMAC_3_IRQn               = 34,
-    DMAC_OTHER_IRQn           = 35,
+    DMAC_4_IRQn               = 35,
     EVSYS_0_IRQn              = 36,
     EVSYS_1_IRQn              = 37,
     EVSYS_2_IRQn              = 38,
     EVSYS_3_IRQn              = 39,
-    EVSYS_OTHER_IRQn          = 40,
+    EVSYS_4_IRQn              = 40,
     PAC_IRQn                  = 41,
     RAMECC_IRQn               = 45,
     SERCOM0_0_IRQn            = 46,
     SERCOM0_1_IRQn            = 47,
     SERCOM0_2_IRQn            = 48,
-    SERCOM0_OTHER_IRQn        = 49,
+    SERCOM0_3_IRQn            = 49,
     SERCOM1_0_IRQn            = 50,
     SERCOM1_1_IRQn            = 51,
     SERCOM1_2_IRQn            = 52,
-    SERCOM1_OTHER_IRQn        = 53,
+    SERCOM1_3_IRQn            = 53,
     SERCOM2_0_IRQn            = 54,
     SERCOM2_1_IRQn            = 55,
     SERCOM2_2_IRQn            = 56,
-    SERCOM2_OTHER_IRQn        = 57,
+    SERCOM2_3_IRQn            = 57,
     SERCOM3_0_IRQn            = 58,
     SERCOM3_1_IRQn            = 59,
     SERCOM3_2_IRQn            = 60,
-    SERCOM3_OTHER_IRQn        = 61,
+    SERCOM3_3_IRQn            = 61,
     SERCOM4_0_IRQn            = 62,
     SERCOM4_1_IRQn            = 63,
     SERCOM4_2_IRQn            = 64,
-    SERCOM4_OTHER_IRQn        = 65,
+    SERCOM4_3_IRQn            = 65,
     SERCOM5_0_IRQn            = 66,
     SERCOM5_1_IRQn            = 67,
     SERCOM5_2_IRQn            = 68,
-    SERCOM5_OTHER_IRQn        = 69,
-    USB_OTHER_IRQn            = 80,
-    USB_SOF_HSOF_IRQn         = 81,
-    USB_TRCPT0_IRQn           = 82,
-    USB_TRCPT1_IRQn           = 83,
-    TCC0_OTHER_IRQn           = 85,
-    TCC0_MC0_IRQn             = 86,
-    TCC0_MC1_IRQn             = 87,
-    TCC0_MC2_IRQn             = 88,
-    TCC0_MC3_IRQn             = 89,
-    TCC0_MC4_IRQn             = 90,
-    TCC0_MC5_IRQn             = 91,
-    TCC1_OTHER_IRQn           = 92,
-    TCC1_MC0_IRQn             = 93,
-    TCC1_MC1_IRQn             = 94,
-    TCC1_MC2_IRQn             = 95,
-    TCC1_MC3_IRQn             = 96,
-    TCC2_OTHER_IRQn           = 97,
-    TCC2_MC0_IRQn             = 98,
-    TCC2_MC1_IRQn             = 99,
-    TCC2_MC2_IRQn             = 100,
-    TCC3_OTHER_IRQn           = 101,
-    TCC3_MC0_IRQn             = 102,
-    TCC3_MC1_IRQn             = 103,
-    TCC4_OTHER_IRQn           = 104,
-    TCC4_MC0_IRQn             = 105,
-    TCC4_MC1_IRQn             = 106,
+    SERCOM5_3_IRQn            = 69,
+    USB_0_IRQn                = 80,
+    USB_1_IRQn                = 81,
+    USB_2_IRQn                = 82,
+    USB_3_IRQn                = 83,
+    TCC0_0_IRQn               = 85,
+    TCC0_1_IRQn               = 86,
+    TCC0_2_IRQn               = 87,
+    TCC0_3_IRQn               = 88,
+    TCC0_4_IRQn               = 89,
+    TCC0_5_IRQn               = 90,
+    TCC0_6_IRQn               = 91,
+    TCC1_0_IRQn               = 92,
+    TCC1_1_IRQn               = 93,
+    TCC1_2_IRQn               = 94,
+    TCC1_3_IRQn               = 95,
+    TCC1_4_IRQn               = 96,
+    TCC2_0_IRQn               = 97,
+    TCC2_1_IRQn               = 98,
+    TCC2_2_IRQn               = 99,
+    TCC2_3_IRQn               = 100,
+    TCC3_0_IRQn               = 101,
+    TCC3_1_IRQn               = 102,
+    TCC3_2_IRQn               = 103,
+    TCC4_0_IRQn               = 104,
+    TCC4_1_IRQn               = 105,
+    TCC4_2_IRQn               = 106,
     TC0_IRQn                  = 107,
     TC1_IRQn                  = 108,
     TC2_IRQn                  = 109,
     TC3_IRQn                  = 110,
     TC4_IRQn                  = 111,
     TC5_IRQn                  = 112,
-    PDEC_OTHER_IRQn           = 115,
-    PDEC_MC0_IRQn             = 116,
-    PDEC_MC1_IRQn             = 117,
-    ADC0_OTHER_IRQn           = 118,
-    ADC0_RESRDY_IRQn          = 119,
-    ADC1_OTHER_IRQn           = 120,
-    ADC1_RESRDY_IRQn          = 121,
+    PDEC_0_IRQn               = 115,
+    PDEC_1_IRQn               = 116,
+    PDEC_2_IRQn               = 117,
+    ADC0_0_IRQn               = 118,
+    ADC0_1_IRQn               = 119,
+    ADC1_0_IRQn               = 120,
+    ADC1_1_IRQn               = 121,
     AC_IRQn                   = 122,
-    DAC_OTHER_IRQn            = 123,
-    DAC_EMPTY_0_IRQn          = 124,
-    DAC_EMPTY_1_IRQn          = 125,
-    DAC_RESRDY_0_IRQn         = 126,
-    DAC_RESRDY_1_IRQn         = 127,
+    DAC_0_IRQn                = 123,
+    DAC_1_IRQn                = 124,
+    DAC_2_IRQn                = 125,
+    DAC_3_IRQn                = 126,
+    DAC_4_IRQn                = 127,
     I2S_IRQn                  = 128,
     PCC_IRQn                  = 129,
     AES_IRQn                  = 130,
@@ -1451,32 +1451,32 @@ procedure PendSV_Handler;           external name 'PendSV_Handler';
 procedure SysTick_Handler;          external name 'SysTick_Handler';
 procedure PM_Handler;               external name 'PM_Handler';
 procedure MCLK_Handler;             external name 'MCLK_Handler';
-procedure OSCCTRL_XOSC0_Handler;    external name 'OSCCTRL_XOSC0_Handler';
-procedure OSCCTRL_XOSC1_Handler;    external name 'OSCCTRL_XOSC1_Handler';
-procedure OSCCTRL_DFLL_Handler;     external name 'OSCCTRL_DFLL_Handler';
-procedure OSCCTRL_DPLL0_Handler;    external name 'OSCCTRL_DPLL0_Handler';
-procedure OSCCTRL_DPLL1_Handler;    external name 'OSCCTRL_DPLL1_Handler';
+procedure OSCCTRL_0_Handler;        external name 'OSCCTRL_0_Handler';
+procedure OSCCTRL_1_Handler;        external name 'OSCCTRL_1_Handler';
+procedure OSCCTRL_2_Handler;        external name 'OSCCTRL_2_Handler';
+procedure OSCCTRL_3_Handler;        external name 'OSCCTRL_3_Handler';
+procedure OSCCTRL_4_Handler;        external name 'OSCCTRL_4_Handler';
 procedure OSC32KCTRL_Handler;       external name 'OSC32KCTRL_Handler';
-procedure SUPC_OTHER_Handler;       external name 'SUPC_OTHER_Handler';
-procedure SUPC_BODDET_Handler;      external name 'SUPC_BODDET_Handler';
+procedure SUPC_0_Handler;           external name 'SUPC_0_Handler';
+procedure SUPC_1_Handler;           external name 'SUPC_1_Handler';
 procedure WDT_Handler;              external name 'WDT_Handler';
 procedure RTC_Handler;              external name 'RTC_Handler';
-procedure EIC_EXTINT_0_Handler;     external name 'EIC_EXTINT_0_Handler';
-procedure EIC_EXTINT_1_Handler;     external name 'EIC_EXTINT_1_Handler';
-procedure EIC_EXTINT_2_Handler;     external name 'EIC_EXTINT_2_Handler';
-procedure EIC_EXTINT_3_Handler;     external name 'EIC_EXTINT_3_Handler';
-procedure EIC_EXTINT_4_Handler;     external name 'EIC_EXTINT_4_Handler';
-procedure EIC_EXTINT_5_Handler;     external name 'EIC_EXTINT_5_Handler';
-procedure EIC_EXTINT_6_Handler;     external name 'EIC_EXTINT_6_Handler';
-procedure EIC_EXTINT_7_Handler;     external name 'EIC_EXTINT_7_Handler';
-procedure EIC_EXTINT_8_Handler;     external name 'EIC_EXTINT_8_Handler';
-procedure EIC_EXTINT_9_Handler;     external name 'EIC_EXTINT_9_Handler';
-procedure EIC_EXTINT_10_Handler;    external name 'EIC_EXTINT_10_Handler';
-procedure EIC_EXTINT_11_Handler;    external name 'EIC_EXTINT_11_Handler';
-procedure EIC_EXTINT_12_Handler;    external name 'EIC_EXTINT_12_Handler';
-procedure EIC_EXTINT_13_Handler;    external name 'EIC_EXTINT_13_Handler';
-procedure EIC_EXTINT_14_Handler;    external name 'EIC_EXTINT_14_Handler';
-procedure EIC_EXTINT_15_Handler;    external name 'EIC_EXTINT_15_Handler';
+procedure EIC_0_Handler;            external name 'EIC_0_Handler';
+procedure EIC_1_Handler;            external name 'EIC_1_Handler';
+procedure EIC_2_Handler;            external name 'EIC_2_Handler';
+procedure EIC_3_Handler;            external name 'EIC_3_Handler';
+procedure EIC_4_Handler;            external name 'EIC_4_Handler';
+procedure EIC_5_Handler;            external name 'EIC_5_Handler';
+procedure EIC_6_Handler;            external name 'EIC_6_Handler';
+procedure EIC_7_Handler;            external name 'EIC_7_Handler';
+procedure EIC_8_Handler;            external name 'EIC_8_Handler';
+procedure EIC_9_Handler;            external name 'EIC_9_Handler';
+procedure EIC_10_Handler;           external name 'EIC_10_Handler';
+procedure EIC_11_Handler;           external name 'EIC_11_Handler';
+procedure EIC_12_Handler;           external name 'EIC_12_Handler';
+procedure EIC_13_Handler;           external name 'EIC_13_Handler';
+procedure EIC_14_Handler;           external name 'EIC_14_Handler';
+procedure EIC_15_Handler;           external name 'EIC_15_Handler';
 procedure FREQM_Handler;            external name 'FREQM_Handler';
 procedure NVMCTRL_0_Handler;        external name 'NVMCTRL_0_Handler';
 procedure NVMCTRL_1_Handler;        external name 'NVMCTRL_1_Handler';
@@ -1484,83 +1484,83 @@ procedure DMAC_0_Handler;           external name 'DMAC_0_Handler';
 procedure DMAC_1_Handler;           external name 'DMAC_1_Handler';
 procedure DMAC_2_Handler;           external name 'DMAC_2_Handler';
 procedure DMAC_3_Handler;           external name 'DMAC_3_Handler';
-procedure DMAC_OTHER_Handler;       external name 'DMAC_OTHER_Handler';
+procedure DMAC_4_Handler;           external name 'DMAC_4_Handler';
 procedure EVSYS_0_Handler;          external name 'EVSYS_0_Handler';
 procedure EVSYS_1_Handler;          external name 'EVSYS_1_Handler';
 procedure EVSYS_2_Handler;          external name 'EVSYS_2_Handler';
 procedure EVSYS_3_Handler;          external name 'EVSYS_3_Handler';
-procedure EVSYS_OTHER_Handler;      external name 'EVSYS_OTHER_Handler';
+procedure EVSYS_4_Handler;          external name 'EVSYS_4_Handler';
 procedure PAC_Handler;              external name 'PAC_Handler';
 procedure RAMECC_Handler;           external name 'RAMECC_Handler';
 procedure SERCOM0_0_Handler;        external name 'SERCOM0_0_Handler';
 procedure SERCOM0_1_Handler;        external name 'SERCOM0_1_Handler';
 procedure SERCOM0_2_Handler;        external name 'SERCOM0_2_Handler';
-procedure SERCOM0_OTHER_Handler;    external name 'SERCOM0_OTHER_Handler';
+procedure SERCOM0_3_Handler;        external name 'SERCOM0_3_Handler';
 procedure SERCOM1_0_Handler;        external name 'SERCOM1_0_Handler';
 procedure SERCOM1_1_Handler;        external name 'SERCOM1_1_Handler';
 procedure SERCOM1_2_Handler;        external name 'SERCOM1_2_Handler';
-procedure SERCOM1_OTHER_Handler;    external name 'SERCOM1_OTHER_Handler';
+procedure SERCOM1_3_Handler;        external name 'SERCOM1_3_Handler';
 procedure SERCOM2_0_Handler;        external name 'SERCOM2_0_Handler';
 procedure SERCOM2_1_Handler;        external name 'SERCOM2_1_Handler';
 procedure SERCOM2_2_Handler;        external name 'SERCOM2_2_Handler';
-procedure SERCOM2_OTHER_Handler;    external name 'SERCOM2_OTHER_Handler';
+procedure SERCOM2_3_Handler;        external name 'SERCOM2_3_Handler';
 procedure SERCOM3_0_Handler;        external name 'SERCOM3_0_Handler';
 procedure SERCOM3_1_Handler;        external name 'SERCOM3_1_Handler';
 procedure SERCOM3_2_Handler;        external name 'SERCOM3_2_Handler';
-procedure SERCOM3_OTHER_Handler;    external name 'SERCOM3_OTHER_Handler';
+procedure SERCOM3_3_Handler;        external name 'SERCOM3_3_Handler';
 procedure SERCOM4_0_Handler;        external name 'SERCOM4_0_Handler';
 procedure SERCOM4_1_Handler;        external name 'SERCOM4_1_Handler';
 procedure SERCOM4_2_Handler;        external name 'SERCOM4_2_Handler';
-procedure SERCOM4_OTHER_Handler;    external name 'SERCOM4_OTHER_Handler';
+procedure SERCOM4_3_Handler;        external name 'SERCOM4_3_Handler';
 procedure SERCOM5_0_Handler;        external name 'SERCOM5_0_Handler';
 procedure SERCOM5_1_Handler;        external name 'SERCOM5_1_Handler';
 procedure SERCOM5_2_Handler;        external name 'SERCOM5_2_Handler';
-procedure SERCOM5_OTHER_Handler;    external name 'SERCOM5_OTHER_Handler';
-procedure USB_OTHER_Handler;        external name 'USB_OTHER_Handler';
-procedure USB_SOF_HSOF_Handler;     external name 'USB_SOF_HSOF_Handler';
-procedure USB_TRCPT0_Handler;       external name 'USB_TRCPT0_Handler';
-procedure USB_TRCPT1_Handler;       external name 'USB_TRCPT1_Handler';
-procedure TCC0_OTHER_Handler;       external name 'TCC0_OTHER_Handler';
-procedure TCC0_MC0_Handler;         external name 'TCC0_MC0_Handler';
-procedure TCC0_MC1_Handler;         external name 'TCC0_MC1_Handler';
-procedure TCC0_MC2_Handler;         external name 'TCC0_MC2_Handler';
-procedure TCC0_MC3_Handler;         external name 'TCC0_MC3_Handler';
-procedure TCC0_MC4_Handler;         external name 'TCC0_MC4_Handler';
-procedure TCC0_MC5_Handler;         external name 'TCC0_MC5_Handler';
-procedure TCC1_OTHER_Handler;       external name 'TCC1_OTHER_Handler';
-procedure TCC1_MC0_Handler;         external name 'TCC1_MC0_Handler';
-procedure TCC1_MC1_Handler;         external name 'TCC1_MC1_Handler';
-procedure TCC1_MC2_Handler;         external name 'TCC1_MC2_Handler';
-procedure TCC1_MC3_Handler;         external name 'TCC1_MC3_Handler';
-procedure TCC2_OTHER_Handler;       external name 'TCC2_OTHER_Handler';
-procedure TCC2_MC0_Handler;         external name 'TCC2_MC0_Handler';
-procedure TCC2_MC1_Handler;         external name 'TCC2_MC1_Handler';
-procedure TCC2_MC2_Handler;         external name 'TCC2_MC2_Handler';
-procedure TCC3_OTHER_Handler;       external name 'TCC3_OTHER_Handler';
-procedure TCC3_MC0_Handler;         external name 'TCC3_MC0_Handler';
-procedure TCC3_MC1_Handler;         external name 'TCC3_MC1_Handler';
-procedure TCC4_OTHER_Handler;       external name 'TCC4_OTHER_Handler';
-procedure TCC4_MC0_Handler;         external name 'TCC4_MC0_Handler';
-procedure TCC4_MC1_Handler;         external name 'TCC4_MC1_Handler';
+procedure SERCOM5_3_Handler;        external name 'SERCOM5_3_Handler';
+procedure USB_0_Handler;            external name 'USB_0_Handler';
+procedure USB_1_Handler;            external name 'USB_1_Handler';
+procedure USB_2_Handler;            external name 'USB_2_Handler';
+procedure USB_3_Handler;            external name 'USB_3_Handler';
+procedure TCC0_0_Handler;           external name 'TCC0_0_Handler';
+procedure TCC0_1_Handler;           external name 'TCC0_1_Handler';
+procedure TCC0_2_Handler;           external name 'TCC0_2_Handler';
+procedure TCC0_3_Handler;           external name 'TCC0_3_Handler';
+procedure TCC0_4_Handler;           external name 'TCC0_4_Handler';
+procedure TCC0_5_Handler;           external name 'TCC0_5_Handler';
+procedure TCC0_6_Handler;           external name 'TCC0_6_Handler';
+procedure TCC1_0_Handler;           external name 'TCC1_0_Handler';
+procedure TCC1_1_Handler;           external name 'TCC1_1_Handler';
+procedure TCC1_2_Handler;           external name 'TCC1_2_Handler';
+procedure TCC1_3_Handler;           external name 'TCC1_3_Handler';
+procedure TCC1_4_Handler;           external name 'TCC1_4_Handler';
+procedure TCC2_0_Handler;           external name 'TCC2_0_Handler';
+procedure TCC2_1_Handler;           external name 'TCC2_1_Handler';
+procedure TCC2_2_Handler;           external name 'TCC2_2_Handler';
+procedure TCC2_3_Handler;           external name 'TCC2_3_Handler';
+procedure TCC3_0_Handler;           external name 'TCC3_0_Handler';
+procedure TCC3_1_Handler;           external name 'TCC3_1_Handler';
+procedure TCC3_2_Handler;           external name 'TCC3_2_Handler';
+procedure TCC4_0_Handler;           external name 'TCC4_0_Handler';
+procedure TCC4_1_Handler;           external name 'TCC4_1_Handler';
+procedure TCC4_2_Handler;           external name 'TCC4_2_Handler';
 procedure TC0_Handler;              external name 'TC0_Handler';
 procedure TC1_Handler;              external name 'TC1_Handler';
 procedure TC2_Handler;              external name 'TC2_Handler';
 procedure TC3_Handler;              external name 'TC3_Handler';
 procedure TC4_Handler;              external name 'TC4_Handler';
 procedure TC5_Handler;              external name 'TC5_Handler';
-procedure PDEC_OTHER_Handler;       external name 'PDEC_OTHER_Handler';
-procedure PDEC_MC0_Handler;         external name 'PDEC_MC0_Handler';
-procedure PDEC_MC1_Handler;         external name 'PDEC_MC1_Handler';
-procedure ADC0_OTHER_Handler;       external name 'ADC0_OTHER_Handler';
-procedure ADC0_RESRDY_Handler;      external name 'ADC0_RESRDY_Handler';
-procedure ADC1_OTHER_Handler;       external name 'ADC1_OTHER_Handler';
-procedure ADC1_RESRDY_Handler;      external name 'ADC1_RESRDY_Handler';
+procedure PDEC_0_Handler;           external name 'PDEC_0_Handler';
+procedure PDEC_1_Handler;           external name 'PDEC_1_Handler';
+procedure PDEC_2_Handler;           external name 'PDEC_2_Handler';
+procedure ADC0_0_Handler;           external name 'ADC0_0_Handler';
+procedure ADC0_1_Handler;           external name 'ADC0_1_Handler';
+procedure ADC1_0_Handler;           external name 'ADC1_0_Handler';
+procedure ADC1_1_Handler;           external name 'ADC1_1_Handler';
 procedure AC_Handler;               external name 'AC_Handler';
-procedure DAC_OTHER_Handler;        external name 'DAC_OTHER_Handler';
-procedure DAC_EMPTY_0_Handler;      external name 'DAC_EMPTY_0_Handler';
-procedure DAC_EMPTY_1_Handler;      external name 'DAC_EMPTY_1_Handler';
-procedure DAC_RESRDY_0_Handler;     external name 'DAC_RESRDY_0_Handler';
-procedure DAC_RESRDY_1_Handler;     external name 'DAC_RESRDY_1_Handler';
+procedure DAC_0_Handler;            external name 'DAC_0_Handler';
+procedure DAC_1_Handler;            external name 'DAC_1_Handler';
+procedure DAC_2_Handler;            external name 'DAC_2_Handler';
+procedure DAC_3_Handler;            external name 'DAC_3_Handler';
+procedure DAC_4_Handler;            external name 'DAC_4_Handler';
 procedure I2S_Handler;              external name 'I2S_Handler';
 procedure PCC_Handler;              external name 'PCC_Handler';
 procedure AES_Handler;              external name 'AES_Handler';
@@ -1596,32 +1596,32 @@ asm
   .long SysTick_Handler;
   .long PM_Handler;
   .long MCLK_Handler;
-  .long OSCCTRL_XOSC0_Handler;
-  .long OSCCTRL_XOSC1_Handler;
-  .long OSCCTRL_DFLL_Handler;
-  .long OSCCTRL_DPLL0_Handler;
-  .long OSCCTRL_DPLL1_Handler;
+  .long OSCCTRL_0_Handler;
+  .long OSCCTRL_1_Handler;
+  .long OSCCTRL_2_Handler;
+  .long OSCCTRL_3_Handler;
+  .long OSCCTRL_4_Handler;
   .long OSC32KCTRL_Handler;
-  .long SUPC_OTHER_Handler;
-  .long SUPC_BODDET_Handler;
+  .long SUPC_0_Handler;
+  .long SUPC_1_Handler;
   .long WDT_Handler;
   .long RTC_Handler;
-  .long EIC_EXTINT_0_Handler;
-  .long EIC_EXTINT_1_Handler;
-  .long EIC_EXTINT_2_Handler;
-  .long EIC_EXTINT_3_Handler;
-  .long EIC_EXTINT_4_Handler;
-  .long EIC_EXTINT_5_Handler;
-  .long EIC_EXTINT_6_Handler;
-  .long EIC_EXTINT_7_Handler;
-  .long EIC_EXTINT_8_Handler;
-  .long EIC_EXTINT_9_Handler;
-  .long EIC_EXTINT_10_Handler;
-  .long EIC_EXTINT_11_Handler;
-  .long EIC_EXTINT_12_Handler;
-  .long EIC_EXTINT_13_Handler;
-  .long EIC_EXTINT_14_Handler;
-  .long EIC_EXTINT_15_Handler;
+  .long EIC_0_Handler;
+  .long EIC_1_Handler;
+  .long EIC_2_Handler;
+  .long EIC_3_Handler;
+  .long EIC_4_Handler;
+  .long EIC_5_Handler;
+  .long EIC_6_Handler;
+  .long EIC_7_Handler;
+  .long EIC_8_Handler;
+  .long EIC_9_Handler;
+  .long EIC_10_Handler;
+  .long EIC_11_Handler;
+  .long EIC_12_Handler;
+  .long EIC_13_Handler;
+  .long EIC_14_Handler;
+  .long EIC_15_Handler;
   .long FREQM_Handler;
   .long NVMCTRL_0_Handler;
   .long NVMCTRL_1_Handler;
@@ -1629,12 +1629,12 @@ asm
   .long DMAC_1_Handler;
   .long DMAC_2_Handler;
   .long DMAC_3_Handler;
-  .long DMAC_OTHER_Handler;
+  .long DMAC_4_Handler;
   .long EVSYS_0_Handler;
   .long EVSYS_1_Handler;
   .long EVSYS_2_Handler;
   .long EVSYS_3_Handler;
-  .long EVSYS_OTHER_Handler;
+  .long EVSYS_4_Handler;
   .long PAC_Handler;
   .long 0
   .long 0
@@ -1643,27 +1643,27 @@ asm
   .long SERCOM0_0_Handler;
   .long SERCOM0_1_Handler;
   .long SERCOM0_2_Handler;
-  .long SERCOM0_OTHER_Handler;
+  .long SERCOM0_3_Handler;
   .long SERCOM1_0_Handler;
   .long SERCOM1_1_Handler;
   .long SERCOM1_2_Handler;
-  .long SERCOM1_OTHER_Handler;
+  .long SERCOM1_3_Handler;
   .long SERCOM2_0_Handler;
   .long SERCOM2_1_Handler;
   .long SERCOM2_2_Handler;
-  .long SERCOM2_OTHER_Handler;
+  .long SERCOM2_3_Handler;
   .long SERCOM3_0_Handler;
   .long SERCOM3_1_Handler;
   .long SERCOM3_2_Handler;
-  .long SERCOM3_OTHER_Handler;
+  .long SERCOM3_3_Handler;
   .long SERCOM4_0_Handler;
   .long SERCOM4_1_Handler;
   .long SERCOM4_2_Handler;
-  .long SERCOM4_OTHER_Handler;
+  .long SERCOM4_3_Handler;
   .long SERCOM5_0_Handler;
   .long SERCOM5_1_Handler;
   .long SERCOM5_2_Handler;
-  .long SERCOM5_OTHER_Handler;
+  .long SERCOM5_3_Handler;
   .long 0
   .long 0
   .long 0
@@ -1674,33 +1674,33 @@ asm
   .long 0
   .long 0
   .long 0
-  .long USB_OTHER_Handler;
-  .long USB_SOF_HSOF_Handler;
-  .long USB_TRCPT0_Handler;
-  .long USB_TRCPT1_Handler;
+  .long USB_0_Handler;
+  .long USB_1_Handler;
+  .long USB_2_Handler;
+  .long USB_3_Handler;
   .long 0
-  .long TCC0_OTHER_Handler;
-  .long TCC0_MC0_Handler;
-  .long TCC0_MC1_Handler;
-  .long TCC0_MC2_Handler;
-  .long TCC0_MC3_Handler;
-  .long TCC0_MC4_Handler;
-  .long TCC0_MC5_Handler;
-  .long TCC1_OTHER_Handler;
-  .long TCC1_MC0_Handler;
-  .long TCC1_MC1_Handler;
-  .long TCC1_MC2_Handler;
-  .long TCC1_MC3_Handler;
-  .long TCC2_OTHER_Handler;
-  .long TCC2_MC0_Handler;
-  .long TCC2_MC1_Handler;
-  .long TCC2_MC2_Handler;
-  .long TCC3_OTHER_Handler;
-  .long TCC3_MC0_Handler;
-  .long TCC3_MC1_Handler;
-  .long TCC4_OTHER_Handler;
-  .long TCC4_MC0_Handler;
-  .long TCC4_MC1_Handler;
+  .long TCC0_0_Handler;
+  .long TCC0_1_Handler;
+  .long TCC0_2_Handler;
+  .long TCC0_3_Handler;
+  .long TCC0_4_Handler;
+  .long TCC0_5_Handler;
+  .long TCC0_6_Handler;
+  .long TCC1_0_Handler;
+  .long TCC1_1_Handler;
+  .long TCC1_2_Handler;
+  .long TCC1_3_Handler;
+  .long TCC1_4_Handler;
+  .long TCC2_0_Handler;
+  .long TCC2_1_Handler;
+  .long TCC2_2_Handler;
+  .long TCC2_3_Handler;
+  .long TCC3_0_Handler;
+  .long TCC3_1_Handler;
+  .long TCC3_2_Handler;
+  .long TCC4_0_Handler;
+  .long TCC4_1_Handler;
+  .long TCC4_2_Handler;
   .long TC0_Handler;
   .long TC1_Handler;
   .long TC2_Handler;
@@ -1709,19 +1709,19 @@ asm
   .long TC5_Handler;
   .long 0
   .long 0
-  .long PDEC_OTHER_Handler;
-  .long PDEC_MC0_Handler;
-  .long PDEC_MC1_Handler;
-  .long ADC0_OTHER_Handler;
-  .long ADC0_RESRDY_Handler;
-  .long ADC1_OTHER_Handler;
-  .long ADC1_RESRDY_Handler;
+  .long PDEC_0_Handler;
+  .long PDEC_1_Handler;
+  .long PDEC_2_Handler;
+  .long ADC0_0_Handler;
+  .long ADC0_1_Handler;
+  .long ADC1_0_Handler;
+  .long ADC1_1_Handler;
   .long AC_Handler;
-  .long DAC_OTHER_Handler;
-  .long DAC_EMPTY_0_Handler;
-  .long DAC_EMPTY_1_Handler;
-  .long DAC_RESRDY_0_Handler;
-  .long DAC_RESRDY_1_Handler;
+  .long DAC_0_Handler;
+  .long DAC_1_Handler;
+  .long DAC_2_Handler;
+  .long DAC_3_Handler;
+  .long DAC_4_Handler;
   .long I2S_Handler;
   .long PCC_Handler;
   .long AES_Handler;
@@ -1742,32 +1742,32 @@ asm
   .weak SysTick_Handler;
   .weak PM_Handler;
   .weak MCLK_Handler;
-  .weak OSCCTRL_XOSC0_Handler;
-  .weak OSCCTRL_XOSC1_Handler;
-  .weak OSCCTRL_DFLL_Handler;
-  .weak OSCCTRL_DPLL0_Handler;
-  .weak OSCCTRL_DPLL1_Handler;
+  .weak OSCCTRL_0_Handler;
+  .weak OSCCTRL_1_Handler;
+  .weak OSCCTRL_2_Handler;
+  .weak OSCCTRL_3_Handler;
+  .weak OSCCTRL_4_Handler;
   .weak OSC32KCTRL_Handler;
-  .weak SUPC_OTHER_Handler;
-  .weak SUPC_BODDET_Handler;
+  .weak SUPC_0_Handler;
+  .weak SUPC_1_Handler;
   .weak WDT_Handler;
   .weak RTC_Handler;
-  .weak EIC_EXTINT_0_Handler;
-  .weak EIC_EXTINT_1_Handler;
-  .weak EIC_EXTINT_2_Handler;
-  .weak EIC_EXTINT_3_Handler;
-  .weak EIC_EXTINT_4_Handler;
-  .weak EIC_EXTINT_5_Handler;
-  .weak EIC_EXTINT_6_Handler;
-  .weak EIC_EXTINT_7_Handler;
-  .weak EIC_EXTINT_8_Handler;
-  .weak EIC_EXTINT_9_Handler;
-  .weak EIC_EXTINT_10_Handler;
-  .weak EIC_EXTINT_11_Handler;
-  .weak EIC_EXTINT_12_Handler;
-  .weak EIC_EXTINT_13_Handler;
-  .weak EIC_EXTINT_14_Handler;
-  .weak EIC_EXTINT_15_Handler;
+  .weak EIC_0_Handler;
+  .weak EIC_1_Handler;
+  .weak EIC_2_Handler;
+  .weak EIC_3_Handler;
+  .weak EIC_4_Handler;
+  .weak EIC_5_Handler;
+  .weak EIC_6_Handler;
+  .weak EIC_7_Handler;
+  .weak EIC_8_Handler;
+  .weak EIC_9_Handler;
+  .weak EIC_10_Handler;
+  .weak EIC_11_Handler;
+  .weak EIC_12_Handler;
+  .weak EIC_13_Handler;
+  .weak EIC_14_Handler;
+  .weak EIC_15_Handler;
   .weak FREQM_Handler;
   .weak NVMCTRL_0_Handler;
   .weak NVMCTRL_1_Handler;
@@ -1775,83 +1775,83 @@ asm
   .weak DMAC_1_Handler;
   .weak DMAC_2_Handler;
   .weak DMAC_3_Handler;
-  .weak DMAC_OTHER_Handler;
+  .weak DMAC_4_Handler;
   .weak EVSYS_0_Handler;
   .weak EVSYS_1_Handler;
   .weak EVSYS_2_Handler;
   .weak EVSYS_3_Handler;
-  .weak EVSYS_OTHER_Handler;
+  .weak EVSYS_4_Handler;
   .weak PAC_Handler;
   .weak RAMECC_Handler;
   .weak SERCOM0_0_Handler;
   .weak SERCOM0_1_Handler;
   .weak SERCOM0_2_Handler;
-  .weak SERCOM0_OTHER_Handler;
+  .weak SERCOM0_3_Handler;
   .weak SERCOM1_0_Handler;
   .weak SERCOM1_1_Handler;
   .weak SERCOM1_2_Handler;
-  .weak SERCOM1_OTHER_Handler;
+  .weak SERCOM1_3_Handler;
   .weak SERCOM2_0_Handler;
   .weak SERCOM2_1_Handler;
   .weak SERCOM2_2_Handler;
-  .weak SERCOM2_OTHER_Handler;
+  .weak SERCOM2_3_Handler;
   .weak SERCOM3_0_Handler;
   .weak SERCOM3_1_Handler;
   .weak SERCOM3_2_Handler;
-  .weak SERCOM3_OTHER_Handler;
+  .weak SERCOM3_3_Handler;
   .weak SERCOM4_0_Handler;
   .weak SERCOM4_1_Handler;
   .weak SERCOM4_2_Handler;
-  .weak SERCOM4_OTHER_Handler;
+  .weak SERCOM4_3_Handler;
   .weak SERCOM5_0_Handler;
   .weak SERCOM5_1_Handler;
   .weak SERCOM5_2_Handler;
-  .weak SERCOM5_OTHER_Handler;
-  .weak USB_OTHER_Handler;
-  .weak USB_SOF_HSOF_Handler;
-  .weak USB_TRCPT0_Handler;
-  .weak USB_TRCPT1_Handler;
-  .weak TCC0_OTHER_Handler;
-  .weak TCC0_MC0_Handler;
-  .weak TCC0_MC1_Handler;
-  .weak TCC0_MC2_Handler;
-  .weak TCC0_MC3_Handler;
-  .weak TCC0_MC4_Handler;
-  .weak TCC0_MC5_Handler;
-  .weak TCC1_OTHER_Handler;
-  .weak TCC1_MC0_Handler;
-  .weak TCC1_MC1_Handler;
-  .weak TCC1_MC2_Handler;
-  .weak TCC1_MC3_Handler;
-  .weak TCC2_OTHER_Handler;
-  .weak TCC2_MC0_Handler;
-  .weak TCC2_MC1_Handler;
-  .weak TCC2_MC2_Handler;
-  .weak TCC3_OTHER_Handler;
-  .weak TCC3_MC0_Handler;
-  .weak TCC3_MC1_Handler;
-  .weak TCC4_OTHER_Handler;
-  .weak TCC4_MC0_Handler;
-  .weak TCC4_MC1_Handler;
+  .weak SERCOM5_3_Handler;
+  .weak USB_0_Handler;
+  .weak USB_1_Handler;
+  .weak USB_2_Handler;
+  .weak USB_3_Handler;
+  .weak TCC0_0_Handler;
+  .weak TCC0_1_Handler;
+  .weak TCC0_2_Handler;
+  .weak TCC0_3_Handler;
+  .weak TCC0_4_Handler;
+  .weak TCC0_5_Handler;
+  .weak TCC0_6_Handler;
+  .weak TCC1_0_Handler;
+  .weak TCC1_1_Handler;
+  .weak TCC1_2_Handler;
+  .weak TCC1_3_Handler;
+  .weak TCC1_4_Handler;
+  .weak TCC2_0_Handler;
+  .weak TCC2_1_Handler;
+  .weak TCC2_2_Handler;
+  .weak TCC2_3_Handler;
+  .weak TCC3_0_Handler;
+  .weak TCC3_1_Handler;
+  .weak TCC3_2_Handler;
+  .weak TCC4_0_Handler;
+  .weak TCC4_1_Handler;
+  .weak TCC4_2_Handler;
   .weak TC0_Handler;
   .weak TC1_Handler;
   .weak TC2_Handler;
   .weak TC3_Handler;
   .weak TC4_Handler;
   .weak TC5_Handler;
-  .weak PDEC_OTHER_Handler;
-  .weak PDEC_MC0_Handler;
-  .weak PDEC_MC1_Handler;
-  .weak ADC0_OTHER_Handler;
-  .weak ADC0_RESRDY_Handler;
-  .weak ADC1_OTHER_Handler;
-  .weak ADC1_RESRDY_Handler;
+  .weak PDEC_0_Handler;
+  .weak PDEC_1_Handler;
+  .weak PDEC_2_Handler;
+  .weak ADC0_0_Handler;
+  .weak ADC0_1_Handler;
+  .weak ADC1_0_Handler;
+  .weak ADC1_1_Handler;
   .weak AC_Handler;
-  .weak DAC_OTHER_Handler;
-  .weak DAC_EMPTY_0_Handler;
-  .weak DAC_EMPTY_1_Handler;
-  .weak DAC_RESRDY_0_Handler;
-  .weak DAC_RESRDY_1_Handler;
+  .weak DAC_0_Handler;
+  .weak DAC_1_Handler;
+  .weak DAC_2_Handler;
+  .weak DAC_3_Handler;
+  .weak DAC_4_Handler;
   .weak I2S_Handler;
   .weak PCC_Handler;
   .weak AES_Handler;
@@ -1872,32 +1872,32 @@ asm
   .set SysTick_Handler,         _SysTick_Handler
   .set PM_Handler,              Haltproc
   .set MCLK_Handler,            Haltproc
-  .set OSCCTRL_XOSC0_Handler,   Haltproc
-  .set OSCCTRL_XOSC1_Handler,   Haltproc
-  .set OSCCTRL_DFLL_Handler,    Haltproc
-  .set OSCCTRL_DPLL0_Handler,   Haltproc
-  .set OSCCTRL_DPLL1_Handler,   Haltproc
+  .set OSCCTRL_0_Handler,       Haltproc
+  .set OSCCTRL_1_Handler,       Haltproc
+  .set OSCCTRL_2_Handler,       Haltproc
+  .set OSCCTRL_3_Handler,       Haltproc
+  .set OSCCTRL_4_Handler,       Haltproc
   .set OSC32KCTRL_Handler,      Haltproc
-  .set SUPC_OTHER_Handler,      Haltproc
-  .set SUPC_BODDET_Handler,     Haltproc
+  .set SUPC_0_Handler,          Haltproc
+  .set SUPC_1_Handler,          Haltproc
   .set WDT_Handler,             Haltproc
   .set RTC_Handler,             Haltproc
-  .set EIC_EXTINT_0_Handler,    Haltproc
-  .set EIC_EXTINT_1_Handler,    Haltproc
-  .set EIC_EXTINT_2_Handler,    Haltproc
-  .set EIC_EXTINT_3_Handler,    Haltproc
-  .set EIC_EXTINT_4_Handler,    Haltproc
-  .set EIC_EXTINT_5_Handler,    Haltproc
-  .set EIC_EXTINT_6_Handler,    Haltproc
-  .set EIC_EXTINT_7_Handler,    Haltproc
-  .set EIC_EXTINT_8_Handler,    Haltproc
-  .set EIC_EXTINT_9_Handler,    Haltproc
-  .set EIC_EXTINT_10_Handler,   Haltproc
-  .set EIC_EXTINT_11_Handler,   Haltproc
-  .set EIC_EXTINT_12_Handler,   Haltproc
-  .set EIC_EXTINT_13_Handler,   Haltproc
-  .set EIC_EXTINT_14_Handler,   Haltproc
-  .set EIC_EXTINT_15_Handler,   Haltproc
+  .set EIC_0_Handler,           Haltproc
+  .set EIC_1_Handler,           Haltproc
+  .set EIC_2_Handler,           Haltproc
+  .set EIC_3_Handler,           Haltproc
+  .set EIC_4_Handler,           Haltproc
+  .set EIC_5_Handler,           Haltproc
+  .set EIC_6_Handler,           Haltproc
+  .set EIC_7_Handler,           Haltproc
+  .set EIC_8_Handler,           Haltproc
+  .set EIC_9_Handler,           Haltproc
+  .set EIC_10_Handler,          Haltproc
+  .set EIC_11_Handler,          Haltproc
+  .set EIC_12_Handler,          Haltproc
+  .set EIC_13_Handler,          Haltproc
+  .set EIC_14_Handler,          Haltproc
+  .set EIC_15_Handler,          Haltproc
   .set FREQM_Handler,           Haltproc
   .set NVMCTRL_0_Handler,       Haltproc
   .set NVMCTRL_1_Handler,       Haltproc
@@ -1905,83 +1905,83 @@ asm
   .set DMAC_1_Handler,          Haltproc
   .set DMAC_2_Handler,          Haltproc
   .set DMAC_3_Handler,          Haltproc
-  .set DMAC_OTHER_Handler,      Haltproc
+  .set DMAC_4_Handler,          Haltproc
   .set EVSYS_0_Handler,         Haltproc
   .set EVSYS_1_Handler,         Haltproc
   .set EVSYS_2_Handler,         Haltproc
   .set EVSYS_3_Handler,         Haltproc
-  .set EVSYS_OTHER_Handler,     Haltproc
+  .set EVSYS_4_Handler,         Haltproc
   .set PAC_Handler,             Haltproc
   .set RAMECC_Handler,          Haltproc
   .set SERCOM0_0_Handler,       Haltproc
   .set SERCOM0_1_Handler,       Haltproc
   .set SERCOM0_2_Handler,       Haltproc
-  .set SERCOM0_OTHER_Handler,   Haltproc
+  .set SERCOM0_3_Handler,       Haltproc
   .set SERCOM1_0_Handler,       Haltproc
   .set SERCOM1_1_Handler,       Haltproc
   .set SERCOM1_2_Handler,       Haltproc
-  .set SERCOM1_OTHER_Handler,   Haltproc
+  .set SERCOM1_3_Handler,       Haltproc
   .set SERCOM2_0_Handler,       Haltproc
   .set SERCOM2_1_Handler,       Haltproc
   .set SERCOM2_2_Handler,       Haltproc
-  .set SERCOM2_OTHER_Handler,   Haltproc
+  .set SERCOM2_3_Handler,       Haltproc
   .set SERCOM3_0_Handler,       Haltproc
   .set SERCOM3_1_Handler,       Haltproc
   .set SERCOM3_2_Handler,       Haltproc
-  .set SERCOM3_OTHER_Handler,   Haltproc
+  .set SERCOM3_3_Handler,       Haltproc
   .set SERCOM4_0_Handler,       Haltproc
   .set SERCOM4_1_Handler,       Haltproc
   .set SERCOM4_2_Handler,       Haltproc
-  .set SERCOM4_OTHER_Handler,   Haltproc
+  .set SERCOM4_3_Handler,       Haltproc
   .set SERCOM5_0_Handler,       Haltproc
   .set SERCOM5_1_Handler,       Haltproc
   .set SERCOM5_2_Handler,       Haltproc
-  .set SERCOM5_OTHER_Handler,   Haltproc
-  .set USB_OTHER_Handler,       Haltproc
-  .set USB_SOF_HSOF_Handler,    Haltproc
-  .set USB_TRCPT0_Handler,      Haltproc
-  .set USB_TRCPT1_Handler,      Haltproc
-  .set TCC0_OTHER_Handler,      Haltproc
-  .set TCC0_MC0_Handler,        Haltproc
-  .set TCC0_MC1_Handler,        Haltproc
-  .set TCC0_MC2_Handler,        Haltproc
-  .set TCC0_MC3_Handler,        Haltproc
-  .set TCC0_MC4_Handler,        Haltproc
-  .set TCC0_MC5_Handler,        Haltproc
-  .set TCC1_OTHER_Handler,      Haltproc
-  .set TCC1_MC0_Handler,        Haltproc
-  .set TCC1_MC1_Handler,        Haltproc
-  .set TCC1_MC2_Handler,        Haltproc
-  .set TCC1_MC3_Handler,        Haltproc
-  .set TCC2_OTHER_Handler,      Haltproc
-  .set TCC2_MC0_Handler,        Haltproc
-  .set TCC2_MC1_Handler,        Haltproc
-  .set TCC2_MC2_Handler,        Haltproc
-  .set TCC3_OTHER_Handler,      Haltproc
-  .set TCC3_MC0_Handler,        Haltproc
-  .set TCC3_MC1_Handler,        Haltproc
-  .set TCC4_OTHER_Handler,      Haltproc
-  .set TCC4_MC0_Handler,        Haltproc
-  .set TCC4_MC1_Handler,        Haltproc
+  .set SERCOM5_3_Handler,       Haltproc
+  .set USB_0_Handler,           Haltproc
+  .set USB_1_Handler,           Haltproc
+  .set USB_2_Handler,           Haltproc
+  .set USB_3_Handler,           Haltproc
+  .set TCC0_0_Handler,          Haltproc
+  .set TCC0_1_Handler,          Haltproc
+  .set TCC0_2_Handler,          Haltproc
+  .set TCC0_3_Handler,          Haltproc
+  .set TCC0_4_Handler,          Haltproc
+  .set TCC0_5_Handler,          Haltproc
+  .set TCC0_6_Handler,          Haltproc
+  .set TCC1_0_Handler,          Haltproc
+  .set TCC1_1_Handler,          Haltproc
+  .set TCC1_2_Handler,          Haltproc
+  .set TCC1_3_Handler,          Haltproc
+  .set TCC1_4_Handler,          Haltproc
+  .set TCC2_0_Handler,          Haltproc
+  .set TCC2_1_Handler,          Haltproc
+  .set TCC2_2_Handler,          Haltproc
+  .set TCC2_3_Handler,          Haltproc
+  .set TCC3_0_Handler,          Haltproc
+  .set TCC3_1_Handler,          Haltproc
+  .set TCC3_2_Handler,          Haltproc
+  .set TCC4_0_Handler,          Haltproc
+  .set TCC4_1_Handler,          Haltproc
+  .set TCC4_2_Handler,          Haltproc
   .set TC0_Handler,             Haltproc
   .set TC1_Handler,             Haltproc
   .set TC2_Handler,             Haltproc
   .set TC3_Handler,             Haltproc
   .set TC4_Handler,             Haltproc
   .set TC5_Handler,             Haltproc
-  .set PDEC_OTHER_Handler,      Haltproc
-  .set PDEC_MC0_Handler,        Haltproc
-  .set PDEC_MC1_Handler,        Haltproc
-  .set ADC0_OTHER_Handler,      Haltproc
-  .set ADC0_RESRDY_Handler,     Haltproc
-  .set ADC1_OTHER_Handler,      Haltproc
-  .set ADC1_RESRDY_Handler,     Haltproc
+  .set PDEC_0_Handler,          Haltproc
+  .set PDEC_1_Handler,          Haltproc
+  .set PDEC_2_Handler,          Haltproc
+  .set ADC0_0_Handler,          Haltproc
+  .set ADC0_1_Handler,          Haltproc
+  .set ADC1_0_Handler,          Haltproc
+  .set ADC1_1_Handler,          Haltproc
   .set AC_Handler,              Haltproc
-  .set DAC_OTHER_Handler,       Haltproc
-  .set DAC_EMPTY_0_Handler,     Haltproc
-  .set DAC_EMPTY_1_Handler,     Haltproc
-  .set DAC_RESRDY_0_Handler,    Haltproc
-  .set DAC_RESRDY_1_Handler,    Haltproc
+  .set DAC_0_Handler,           Haltproc
+  .set DAC_1_Handler,           Haltproc
+  .set DAC_2_Handler,           Haltproc
+  .set DAC_3_Handler,           Haltproc
+  .set DAC_4_Handler,           Haltproc
   .set I2S_Handler,             Haltproc
   .set PCC_Handler,             Haltproc
   .set AES_Handler,             Haltproc
