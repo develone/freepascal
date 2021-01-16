@@ -89,7 +89,7 @@ CPU_UNITS=lpc21x4 at91sam7x256 sc32442b
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv6m)
-CPU_UNITS=stm32g071xx
+CPU_UNITS=stm32g071xx samd21e18a samd21g18a samd21j18a
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7a)

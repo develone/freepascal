@@ -114,7 +114,7 @@ asm
 
   bl PASCALMAIN
   b HaltProc
-  .align 4
+  .balign 4
 .L_bss_start:
   .long _bss_start
 .L_bss_end:

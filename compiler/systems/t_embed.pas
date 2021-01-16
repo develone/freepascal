@@ -530,6 +530,7 @@ begin
       ct_stm32f107vc,
       ct_nucleof103rb,
       ct_stm32vldiscovery,
+      ct_bluepill,
 
       { ST Microelectronics f2 family }
       ct_stm32f205rb,
@@ -1797,8 +1798,23 @@ begin
  
       { Atmel }
       ct_sam3x8e,
+      ct_samd21e18a,
+      ct_samd21g18a,
+      ct_samd21j18a,
+      ct_samd51g19a,
+      ct_samd51j19a,
+      ct_samd51p19a,
       ct_arduino_due,
       ct_flip_n_click,
+      ct_xiao,
+      ct_feather_m0,
+      ct_itsybitsy_m0,
+      ct_metro_m0,
+      ct_trinket_m0,
+      ct_wio_terminal,
+      ct_feather_m4,
+      ct_itsybitsy_m4,
+      ct_metro_m4,
       
       { Nordic Semiconductor }
       ct_nrf51422_xxaa,

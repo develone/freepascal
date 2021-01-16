@@ -397,6 +397,7 @@ Type
       ct_stm32f107vc,
       ct_nucleof103rb,
       ct_stm32vldiscovery,
+      ct_bluepill,
 
       { ST Microelectronics f2 family }
       ct_stm32f205rb,
@@ -1678,8 +1679,23 @@ Type
 
       { Atmel }
       ct_sam3x8e,
+      ct_samd21e18a,
+      ct_samd21g18a,
+      ct_samd21j18a,
+      ct_samd51g19a,
+      ct_samd51j19a,
+      ct_samd51p19a,
       ct_arduino_due,
       ct_flip_n_click,
+      ct_xiao,
+      ct_feather_m0,
+      ct_itsybitsy_m0,
+      ct_metro_m0,
+      ct_trinket_m0,
+      ct_wio_terminal,
+      ct_feather_m4,
+      ct_itsybitsy_m4,
+      ct_metro_m4,
       
       { Nordic Semiconductor }
       ct_nrf51422_xxaa,
@@ -2100,6 +2116,7 @@ Const
       (controllertypestr:'STM32F107VC'         ; controllerunitstr:'STM32F107XC'         ; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
       (controllertypestr:'NUCLEOF103RB'        ; controllerunitstr:'STM32F103XB'         ; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00005000),
       (controllertypestr:'STM32VLDISCOVERY'    ; controllerunitstr:'STM32F100XB'         ; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00002000),
+      (controllertypestr:'BLUEPILL'            ; controllerunitstr:'STM32F103XB'         ; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00010000; srambase:$20000000; sramsize:$00005000),
 
       { ST Microelectronics F2 family }
       (controllertypestr:'STM32F205RB'         ; controllerunitstr:'STM32F205XX'         ; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$08000000; flashsize:$00020000; srambase:$20000000; sramsize:$00010000),
@@ -3380,8 +3397,24 @@ Const
 
       { Atmel }
       (controllertypestr:'ATSAM3X8E';     controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
+      (controllertypestr:'SAMD21E18A'    ;controllerunitstr:'SAMD21E18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00000000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'SAMD21G18A'    ;controllerunitstr:'SAMD21G18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00000000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'SAMD21J18A'    ;controllerunitstr:'SAMD21J18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00000000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'SAMD51G19A'    ;controllerunitstr:'SAMD51G19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'SAMD51J19A'    ;controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'SAMD51P19A'    ;controllerunitstr:'SAMD51P19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00080000; srambase:$20000000; sramsize:$00030000),
+
       (controllertypestr:'ARDUINO_DUE';   controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
       (controllertypestr:'FLIP_N_CLICK';  controllerunitstr:'SAM3X8E'; cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00080000; flashsize:$00040000; srambase:$20000000; sramsize:$00010000),
+      (controllertypestr:'XIAO'          ;controllerunitstr:'SAMD21G18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00002000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'FEATHER_M0'    ;controllerunitstr:'SAMD21G18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00002000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'ITSYBITSY_M0'  ;controllerunitstr:'SAMD21G18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00002000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'METRO_M0'      ;controllerunitstr:'SAMD21G18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00002000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'TRINKET_M0'    ;controllerunitstr:'SAMD21E18A'   ; cputype:cpu_armv6m;  fputype:fpu_soft;  flashbase:$00002000; flashsize:$00040000; srambase:$20000000; sramsize:$00008000),
+      (controllertypestr:'WIO_TERMINAL'  ;controllerunitstr:'SAMD51P19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'FEATHER_M4';    controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'ITSYBITSY_M4'  ;controllerunitstr:'SAMD51G19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
+      (controllertypestr:'METRO_M4'      ;controllerunitstr:'SAMD51J19A'   ; cputype:cpu_armv7em; fputype:fpu_vfpv4; flashbase:$00004000; flashsize:$0007C000; srambase:$20000000; sramsize:$00030000),
       
       { Nordic Semiconductor }
       (controllertypestr:'NRF51422_XXAA'; controllerunitstr:'NRF51'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$00000000; flashsize:$00040000;      srambase:$20000000; sramsize:$00004000),

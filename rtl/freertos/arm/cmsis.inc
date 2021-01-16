@@ -291,7 +291,7 @@ interface
       SysTick : TSysTick_Registers absolute SysTick_BASE;
   {$endif}
 
-  {$if not defined(__CORTEXM0)}
+  {$if not defined(CPUARMV6M)}
   type
     TITM_Port = 0..31;
   procedure ITM_SendData(Port: TITM_Port; Data: longword);
@@ -311,20 +311,20 @@ implementation
 {$ENDIF}
 
 {$if defined(IMPLEMENTATION)}
-  {$if not defined(__CORTEXM0)}
-  procedure ITM_SendData(Port: TITM_Port; Data: longword);
-  const
-    CoreDebug_DEMCR_TRCENA = $01000000;
-    ITM_TCR_ITMENA   = $00000001;
-  begin
-    if ((CoreDebug.DEMCR and CoreDebug_DEMCR_TRCENA) <> 0) and
-       ((ITM.TCR and ITM_TCR_ITMENA) <> 0) and
-       ((ITM.TER and (1 shl Port)) <> 0) then
+  {$if not defined(CPUARMV6M)}
+    procedure ITM_SendData(Port: TITM_Port; Data: longword);
+    const
+      CoreDebug_DEMCR_TRCENA = $01000000;
+      ITM_TCR_ITMENA   = $00000001;
     begin
-      while ITM.Port[Port].u8 = 0 do;
-      ITM.Port[Port].u32 := Data;
+      if ((CoreDebug.DEMCR and CoreDebug_DEMCR_TRCENA) <> 0) and
+         ((ITM.TCR and ITM_TCR_ITMENA) <> 0) and
+         ((ITM.TER and (1 shl Port)) <> 0) then
+      begin
+        while ITM.Port[Port].u8 = 0 do;
+        ITM.Port[Port].u32 := Data;
+      end;
     end;
-  end;
   {$endif}
 
   procedure NVIC_SetPriority(IRQn: TIRQn_Enum; priority: longword);

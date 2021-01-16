@@ -9,9 +9,45 @@ var
 
 procedure Pascalmain; external name 'PASCALMAIN';
 
+procedure _NonMaskableInt_Handler; assembler; nostackframe; public name '_NonMaskableInt_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _HardFault_Handler; assembler; nostackframe; public name '_HardFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVC_Handler; assembler; nostackframe; public name '_SVC_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _PendSV_Handler; assembler; nostackframe; public name '_PendSV_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SysTick_Handler; assembler; nostackframe; public name '_SysTick_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
 procedure HaltProc; assembler; nostackframe; public name'_haltproc';
 asm
 .Lloop:
+   bkpt
    b .Lloop
 end;
 
@@ -47,15 +83,13 @@ asm
   cmp r1,r2
   bls .Lzeroloop
 
-{$ifdef REMAP_VECTTAB}
   ldr r0, .Lvtor
   ldr r1, .Ltext_start
   str r1, [r0]
-{$endif REMAP_VECTTAB}
 
   bl PASCALMAIN
   b HaltProc
-
+  .balign 4
 .L_bss_start:
   .long _bss_start
 .L_bss_end:
@@ -66,10 +100,8 @@ asm
   .long _data
 .L_edata:
   .long _edata
-{$ifdef REMAP_VECTTAB}
 .Lvtor:
   .long 0xE000ED08
 .Ltext_start:
   .long _text_start
-{$endif REMAP_VECTTAB}
 end;
