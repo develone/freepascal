@@ -71,11 +71,19 @@ CPU_SPECIFIC_COMMON_UNITS=
 ifeq ($(ARCH),arm)
 CPU_SPECIFIC_COMMON_UNITS=sysutils math classes fgl macpas typinfo types rtlconsts getopts lineinfo
 ifeq ($(SUBARCH),armv7m)
-CPU_UNITS=lm3fury lm3tempest stm32f10x_ld stm32f10x_md stm32f10x_hd stm32f10x_xl stm32f10x_conn stm32f10x_cl lpc13xx lpc1768 lm4f120 sam3x8e xmc4500 cortexm3 cortexm4 # thumb2_bare
+CPU_UNITS=lm3fury lm3tempest  thumb2_bare
+CPU_UNITS+=stm32f100xb stm32f100xe stm32f101x6 stm32f101xb stm32f101xe stm32f101xg stm32f102x6 stm32f102xb stm32f103x6 stm32f103xb stm32f103xe stm32f103xg stm32f105xc stm32f107xc 
+CPU_UNITS+=stm32l100xb stm32l100xba stm32l100xc stm32l151xb stm32l151xba stm32l151xc stm32l151xca stm32l151xd stm32l151xdx stm32l151xe stm32l152xb stm32l152xba stm32l152xc stm32l152xca stm32l152xd stm32l152xdx stm32l152xe stm32l162xc stm32l162xca stm32l162xd stm32l162xdx stm32l162xe 
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7em)
-CPU_UNITS=lm4f120 xmc4500 mk20d5 mk20d7 mk22f51212 mk64f12 stm32f401xx stm32f407xx stm32f411xe stm32f429xx stm32f446xx stm32f745 stm32f746 stm32f756 nrf52 cortexm3 cortexm4 cortexm7 # thumb2_bare
+CPU_UNITS=lm4f120 xmc4500 mk20d5 mk20d7 mk22f51212 mk64f12  thumb2_bare
+CPU_UNITS+=stm32f301x8 stm32f302x8 stm32f302xc stm32f302xe stm32f303x8 stm32f303xc stm32f303xe stm32f318xx stm32f328xx stm32f334x8 stm32f358xx stm32f373xc stm32f378xx stm32f398xx 
+CPU_UNITS+=stm32f401xc stm32f401xe stm32f405xx stm32f407xx stm32f410cx stm32f410rx stm32f410tx stm32f411xe stm32f412cx stm32f412rx stm32f412vx stm32f412zx stm32f413xx stm32f415xx stm32f417xx stm32f423xx stm32f427xx stm32f429xx stm32f437xx stm32f439xx stm32f446xx stm32f469xx stm32f479xx 
+CPU_UNITS+=stm32g431xx stm32g441xx stm32g471xx stm32g473xx stm32g474xx stm32g483xx stm32g484xx stm32g491xx stm32g4a1xx 
+CPU_UNITS+=stm32h723xx stm32h725xx stm32h730xx stm32h730xxq stm32h733xx stm32h735xx stm32h742xx stm32h743xx stm32h745xx stm32h747xx stm32h750xx stm32h753xx stm32h755xx stm32h757xx stm32h7a3xx stm32h7a3xxq stm32h7b0xx stm32h7b0xxq stm32h7b3xx stm32h7b3xxq 
+CPU_UNITS+=stm32l412xx stm32l422xx stm32l431xx stm32l432xx stm32l433xx stm32l442xx stm32l443xx stm32l451xx stm32l452xx stm32l462xx stm32l471xx stm32l475xx stm32l476xx stm32l485xx stm32l486xx stm32l496xx stm32l4a6xx stm32l4p5xx stm32l4q5xx stm32l4r5xx stm32l4r7xx stm32l4r9xx stm32l4s5xx stm32l4s7xx stm32l4s9xx 
+CPU_UNITS+=stm32wb30xx stm32wb35xx stm32wb50xx stm32wb55xx stm32wb5mxx 
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv4t)
@@ -87,7 +95,10 @@ CPU_UNITS=lpc21x4 at91sam7x256 sc32442b
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv6m)
-CPU_UNITS=lpc8xx lpc11xx lpc122x stm32f0xx nrf51 cortexm0
+CPU_UNITS=lpc8xx lpc11xx lpc122x  cortexm0
+CPU_UNITS+=stm32f030x6 stm32f030x8 stm32f030xc stm32f031x6 stm32f038xx stm32f042x6 stm32f048xx stm32f051x8 stm32f058xx stm32f070x6 stm32f070xb stm32f071xb stm32f072xb stm32f078xx stm32f091xc stm32f098xx 
+CPU_UNITS+=stm32g030xx stm32g031xx stm32g041xx stm32g050xx stm32g051xx stm32g061xx stm32g070xx stm32g071xx stm32g081xx stm32g0b0xx stm32g0b1xx stm32g0c1xx 
+CPU_UNITS+=stm32l010x4 stm32l010x6 stm32l010x8 stm32l010xb stm32l011xx stm32l021xx stm32l031xx stm32l041xx stm32l051xx stm32l052xx stm32l053xx stm32l062xx stm32l063xx stm32l071xx stm32l072xx stm32l073xx stm32l081xx stm32l082xx stm32l083xx 
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7a)
@@ -443,3 +454,4 @@ sortbase$(PPUEXT) : $(INC)/sortbase.pp objpas$(PPUEXT) $(SYSTEMUNIT)$(PPUEXT)
 avrsim$(PPUEXT): $(ARCH)/avrsim.pp heapmgr$(PPUEXT) consoleio$(PPUEXT) $(SYSTEMUNIT)$(PPUEXT)
 	$(COMPILER) $(ARCH)/avrsim.pp
  
+
