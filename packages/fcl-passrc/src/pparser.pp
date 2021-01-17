@@ -2527,11 +2527,16 @@ begin
         NextToken;
         if CurToken=tkspecialize then
           begin
+          // Obj.specialize ...
           if CanSpecialize=aMust then
             CheckToken(tkLessThan);
           CanSpecialize:=aMust;
           NextToken;
-          end;
+          end
+        else if msDelphi in CurrentModeswitches then
+          CanSpecialize:=aCan
+        else
+          CanSpecialize:=aCannot;
         if CurToken in [tkIdentifier,tktrue,tkfalse,tkself] then // true and false are sub identifiers as well
           begin
           aName:=aName+'.'+CurTokenString;
@@ -3137,7 +3142,10 @@ begin
       FinishedModule;
   finally
     if HasFinished then
+      //begin
+      //Module.Release{$IFDEF CheckPasTreeRefCount}('TPasPackage.Modules'){$ENDIF};
       FCurModule:=nil; // clear module if there is an error or finished parsing
+      //end;
   end;
 end;
 
@@ -4336,26 +4344,43 @@ end;
 procedure TPasParser.ParseExportDecl(Parent: TPasElement; List: TFPList);
 Var
   E : TPasExportSymbol;
+  aName: String;
+  NameExpr: TPasExpr;
 begin
-  Repeat
-    if List.Count<>0 then
-      ExpectIdentifier;
-    E:=TPasExportSymbol(CreateElement(TPasExportSymbol,CurtokenString,Parent));
-    List.Add(E);
-    NextToken;
-    if CurTokenIsIdentifier('INDEX') then
-      begin
-      NextToken;
-      E.Exportindex:=DoParseExpression(E,Nil)
-      end
-    else if CurTokenIsIdentifier('NAME') then
-      begin
-      NextToken;
-      E.ExportName:=DoParseExpression(E,Nil)
-      end;
-    if not (CurToken in [tkComma,tkSemicolon]) then
-      ParseExc(nParserExpectedCommaSemicolon,SParserExpectedCommaSemicolon);
-  until (CurToken=tkSemicolon);
+  try
+    Repeat
+      if List.Count>0 then
+        ExpectIdentifier;
+      aName:=ReadDottedIdentifier(Parent,NameExpr,true);
+      E:=TPasExportSymbol(CreateElement(TPasExportSymbol,aName,Parent));
+      if NameExpr.Kind=pekIdent then
+        // simple identifier -> no need to store NameExpr
+        NameExpr.Release{$IFDEF CheckPasTreeRefCount}('CreateElement'){$ENDIF}
+      else
+        begin
+        E.NameExpr:=NameExpr;
+        NameExpr.Parent:=E;
+        end;
+      NameExpr:=nil;
+      List.Add(E);
+      if CurTokenIsIdentifier('INDEX') then
+        begin
+        NextToken;
+        E.Exportindex:=DoParseExpression(E,Nil)
+        end
+      else if CurTokenIsIdentifier('NAME') then
+        begin
+        NextToken;
+        E.ExportName:=DoParseExpression(E,Nil)
+        end;
+      if not (CurToken in [tkComma,tkSemicolon]) then
+        ParseExc(nParserExpectedCommaSemicolon,SParserExpectedCommaSemicolon);
+      Engine.FinishScope(stDeclaration,E);
+    until (CurToken=tkSemicolon);
+  finally
+    if NameExpr<>nil then
+      NameExpr.Release{$IFDEF CheckPasTreeRefCount}('CreateElement'){$ENDIF}
+  end;
 end;
 
 function TPasParser.ParseProcedureType(Parent: TPasElement;
@@ -4938,7 +4963,7 @@ procedure TPasParser.ParseArgList(Parent: TPasElement; Args: TFPList; EndToken: 
       end;
   end;
 var
-  IsUntyped, ok, LastHadDefaultValue: Boolean;
+  OldForceCaret,IsUntyped, ok, LastHadDefaultValue: Boolean;
   Name : String;
   Value : TPasExpr;
   i, OldArgCount: Integer;
@@ -5017,9 +5042,11 @@ begin
     if not IsUntyped then
       begin
       Arg := TPasArgument(Args[OldArgCount]);
-      ArgType := ParseType(Arg,CurSourcePos);
+      ArgType:=Nil;
       ok:=false;
+      oldForceCaret:=Scanner.SetForceCaret(True);
       try
+        ArgType := ParseType(Arg,CurSourcePos);
         NextToken;
         if CurToken = tkEqual then
           begin
@@ -5043,6 +5070,7 @@ begin
         UngetToken;
         ok:=true;
       finally
+        Scanner.SetForceCaret(oldForceCaret);
         if (not ok) and (ArgType<>nil) then
           ArgType.Release{$IFDEF CheckPasTreeRefCount}('CreateElement'){$ENDIF};
       end;
@@ -5339,6 +5367,7 @@ Var
   OK: Boolean;
   IsProcType: Boolean; // false = procedure, true = procedure type
   IsAnonymous: Boolean;
+  OldForceCaret : Boolean;
   PTM: TProcTypeModifier;
   ModTokenCount: Integer;
   LastToken: TToken;
@@ -5356,7 +5385,12 @@ begin
       if CurToken = tkColon then
         begin
         ResultEl:=TPasFunctionType(Element).ResultEl;
-        ResultEl.ResultType := ParseType(ResultEl,CurSourcePos);
+        OldForceCaret:=Scanner.SetForceCaret(True);
+        try
+          ResultEl.ResultType := ParseType(ResultEl,CurSourcePos);
+        finally
+          Scanner.SetForceCaret(OldForceCaret);
+        end;
         end
       // In Delphi mode, the signature in the implementation section can be
       // without result as it was declared

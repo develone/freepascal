@@ -65,16 +65,17 @@ unit cpu;
       _RDRANDSupport,
       _RTMSupport: boolean;
 
+{$ASMMODE ATT}
 
     function InterlockedCompareExchange128(var Target: Int128Rec; NewValue: Int128Rec; Comperand: Int128Rec): Int128Rec;
-      label
-        Lretry;
       begin
+{$if FPC_FULLVERSION >= 30101}
+{$ifndef FPC_PIC}      
         if _RTMSupport then
           begin
             asm
-            Lretry:
-              xbegin Lretry
+            .Lretry:
+              xbegin .Lretry
             end;
             Result:=Target;
             if (Result.Lo=Comperand.Lo) and (Result.Hi=Comperand.Hi) then
@@ -84,9 +85,12 @@ unit cpu;
             end;
           end
         else
+{$endif FPC_PIC}        
+{$endif FPC_FULLVERSION >= 30101}
           RunError(217);
       end;
 
+{$ASMMODE INTEL}
 
     function cpuid_support : boolean;assembler;
       {

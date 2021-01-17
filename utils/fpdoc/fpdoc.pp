@@ -31,11 +31,13 @@ uses
   dw_XML,    // XML writer
   dw_dxml,   // Delphi XML doc.
   dw_HTML,   // HTML writer
+  dw_chm,    // CHM Writer
+  dw_markdown, // Markdown writer
   dw_ipflin, // IPF writer (new linear output)
   dw_man,    // Man page writer
   dw_linrtf, // linear RTF writer
   dw_txt,    // TXT writer
-  fpdocproj, mkfpdoc;
+  fpdocproj, mkfpdoc, dw_basemd, dw_basehtml, fpdocstrs;
 
 
 Type
@@ -53,8 +55,9 @@ Type
     procedure OutputLog(Sender: TObject; const Msg: String);
     procedure ParseCommandLine;
     procedure ParseOption(const S: String);
-    Procedure Usage(AnExitCode : Byte);
-    Procedure DoRun; override;
+    procedure Usage(AnExitCode : Byte);
+    procedure ExceptProc(Sender: TObject; E: Exception);
+    procedure DoRun; override;
   Public
     Constructor Create(AOwner : TComponent); override;
     Destructor Destroy; override;
@@ -62,7 +65,7 @@ Type
   end;
 
 
-Procedure TFPDocApplication.Usage(AnExitCode : Byte);
+procedure TFPDocApplication.Usage(AnExitCode: Byte);
 
 Var
   I,P : Integer;
@@ -101,6 +104,9 @@ begin
   Writeln(SUsageOption215);
   Writeln(SUsageOption215A);
   Writeln(SUsageOption220);
+  Writeln(SUsageOption221);
+  Writeln(SUsageOption222);
+  Writeln(SUsageOption223);
   Writeln(SUsageOption230);
   Writeln(SUsageOption240);
   Writeln(SUsageOption250);
@@ -144,6 +150,13 @@ begin
     L.Free;
   end;
   Halt(AnExitCode);
+end;
+
+procedure TFPDocApplication.ExceptProc(Sender: TObject; E: Exception);
+begin
+{$IFDEF EXCEPTION_STACK}
+  OutputLog(Sender, DumpExceptionCallStack(E));
+{$ENDIF}
 end;
 
 destructor TFPDocApplication.Destroy;
@@ -299,6 +312,12 @@ begin
     FCreator.Options.HideProtected := True
   else if s = '--warn-no-node' then
     FCreator.Options.WarnNoNode := True
+  else if s = '--warn-documentation-empty' then
+    FCreator.Options.WarnDocumentationEmpty := True
+  else if s = '--warn-used-file' then
+    FCreator.Options.WarnUsedFile := True
+  else if s = '--warn-XCT' then
+    FCreator.Options.WarnXCT := True
   else if s = '--show-private' then
     FCreator.Options.ShowPrivate := True
   else if s = '--stop-on-parser-error' then
@@ -425,6 +444,7 @@ begin
   StopOnException:=true;
   FCreator:=TFPDocCreator.Create(Self);
   FCreator.OnLog:=@OutputLog;
+  OnException:= @ExceptProc;
 end;
 
 begin

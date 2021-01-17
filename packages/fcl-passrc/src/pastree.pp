@@ -447,6 +447,7 @@ type
     PackageName: string;
     Filename   : String;  // the IN filename, only written when not empty.
   end;
+  TPasModuleClass = class of TPasModule;
 
   { TPasUnitModule }
 
@@ -974,6 +975,7 @@ type
 
   TPasExportSymbol = class(TPasElement)
   public
+    NameExpr: TPasExpr; // only if name is not a simple identifier
     ExportName : TPasExpr;
     ExportIndex : TPasExpr;
     Destructor Destroy; override;
@@ -1789,6 +1791,7 @@ function GenericTemplateTypesAsString(List: TFPList): string;
 procedure ReleaseProcNameParts(var NameParts: TProcedureNameParts);
 
 function dbgs(const s: TProcTypeModifiers): string; overload;
+function WritePasElTree(Expr: TPasExpr; FollowPrefix: string = ''): string;
 
 {$IFDEF HasPTDumpStack}
 procedure PTDumpStack;
@@ -1901,6 +1904,77 @@ begin
     Result:=Result+ProcTypeModifiers[m];
     end;
   Result:='['+Result+']';
+end;
+
+function WritePasElTree(Expr: TPasExpr; FollowPrefix: string): string;
+{  TBinary Kind= OpCode=
+    +Left=TBinary Kind= OpCode=
+    | +Left=TParamsExpr[]
+    | | +Value=Prim Kind= Value=
+    | | +Params[1]=Prim Kind= Value=
+    +Right=Prim
+}
+var
+  C: TClass;
+  s: string;
+  ParamsExpr: TParamsExpr;
+  InlineSpecExpr: TInlineSpecializeExpr;
+  SubEl: TPasElement;
+  ArrayValues: TArrayValues;
+  i: Integer;
+begin
+  if Expr=nil then exit('nil');
+  C:=Expr.ClassType;
+
+  Result:=C.ClassName;
+  str(Expr.Kind,s);
+  Result:=Result+' '+s;
+  str(Expr.OpCode,s);
+  Result:=Result+' '+s;
+
+  if C=TPrimitiveExpr then
+    Result:=Result+' Value="'+TPrimitiveExpr(Expr).Value+'"'
+  else if C=TUnaryExpr then
+    Result:=Result+' Operand='+WritePasElTree(TUnaryExpr(Expr).Operand,FollowPrefix)
+  else if C=TBoolConstExpr then
+    Result:=Result+' Value='+BoolToStr(TBoolConstExpr(Expr).Value,'True','False')
+  else if C=TArrayValues then
+    begin
+    ArrayValues:=TArrayValues(Expr);
+    for i:=0 to length(ArrayValues.Values)-1 do
+      Result:=Result+sLineBreak+FollowPrefix+'+Values['+IntToStr(i)+']='+WritePasElTree(ArrayValues.Values[i],FollowPrefix+'| ');
+    end
+  else if C=TBinaryExpr then
+    begin
+    Result:=Result+sLineBreak+FollowPrefix+'+Left='+WritePasElTree(TBinaryExpr(Expr).left,FollowPrefix+'| ');
+    Result:=Result+sLineBreak+FollowPrefix+'+Right='+WritePasElTree(TBinaryExpr(Expr).right,FollowPrefix+'| ');
+    end
+  else if C=TParamsExpr then
+    begin
+    ParamsExpr:=TParamsExpr(Expr);
+    Result:=Result+sLineBreak+FollowPrefix+'+Value='+WritePasElTree(ParamsExpr.Value,FollowPrefix+'| ');
+    for i:=0 to length(ParamsExpr.Params)-1 do
+      Result:=Result+sLineBreak+FollowPrefix+'+Params['+IntToStr(i)+']='+WritePasElTree(ParamsExpr.Params[i],FollowPrefix+'| ');
+    end
+  else if C=TInlineSpecializeExpr then
+    begin
+    InlineSpecExpr:=TInlineSpecializeExpr(Expr);
+    Result:=Result+sLineBreak+FollowPrefix+'+Name='+WritePasElTree(InlineSpecExpr.NameExpr,FollowPrefix+'| ');
+    if InlineSpecExpr.Params<>nil then
+      for i:=0 to InlineSpecExpr.Params.Count-1 do
+        begin
+        Result:=Result+sLineBreak+FollowPrefix+'+Params['+IntToStr(i)+']=';
+        SubEl:=TPasElement(InlineSpecExpr.Params[i]);
+        if SubEl=nil then
+          Result:=Result+'nil'
+        else if SubEl is TPasExpr then
+          Result:=Result+WritePasElTree(TPasExpr(SubEl),FollowPrefix+'| ')
+        else
+          Result:=Result+SubEl.Name+':'+SubEl.ClassName;
+        end;
+    end
+  else
+    Result:=C.ClassName+' Kind=';
 end;
 
 Function IndentStrings(S : TStrings; indent : Integer) : string;
@@ -2528,6 +2602,7 @@ end;
 
 destructor TPasExportSymbol.Destroy;
 begin
+  ReleaseAndNil(TPasElement(NameExpr){$IFDEF CheckPasTreeRefCount},'TPasExportSymbol.NameExpr'{$ENDIF});
   ReleaseAndNil(TPasElement(ExportName){$IFDEF CheckPasTreeRefCount},'TPasExportSymbol.ExportName'{$ENDIF});
   ReleaseAndNil(TPasElement(ExportIndex){$IFDEF CheckPasTreeRefCount},'TPasExportSymbol.ExportIndex'{$ENDIF});
   inherited Destroy;
@@ -2551,6 +2626,7 @@ procedure TPasExportSymbol.ForEachCall(const aMethodCall: TOnForEachPasElement;
   const Arg: Pointer);
 begin
   inherited ForEachCall(aMethodCall, Arg);
+  ForEachChildCall(aMethodCall,Arg,NameExpr,false);
   ForEachChildCall(aMethodCall,Arg,ExportName,false);
   ForEachChildCall(aMethodCall,Arg,ExportIndex,false);
 end;
@@ -3024,7 +3100,7 @@ begin
   CN:=CN+' '+IntToStr(FRefCount);
   //If Assigned(Parent) then
   //  CN:=CN+' ('+Parent.ClassName+')';
-  Writeln('TPasElement.Release : ',Cn);
+  Writeln('TPasElement.Release : ',Cn,' at ',aId);
   {AllowWriteln-}
   {$endif}
   {$IFDEF CheckPasTreeRefCount}
@@ -3060,7 +3136,7 @@ begin
     Dec(FGlobalRefCount);
     {$endif}
     end;
-{$if defined(debugrefcount) or defined(VerbosePasTreeMem)}  Writeln('TPasElement.Released : ',Cn); {$endif}
+{$if defined(debugrefcount) or defined(VerbosePasTreeMem)}  Writeln('TPasElement.Released : ',Cn,' at ',aID); {$endif}
 end;
 
 procedure TPasElement.ForEachCall(const aMethodCall: TOnForEachPasElement;
