@@ -2914,7 +2914,8 @@ const
     (k:'STM32L4';v:$00ff6919),
     (k:'STM32L5';v:$04240bdf),
     (k:'STM32WB';v:$70d16653),
-    (k:'STM32WL';v:$21460ff0)
+    (k:'STM32WL';v:$21460ff0),
+    (k:'RP2040' ;v:$e48bff56)
   );
 
 var
@@ -2930,7 +2931,10 @@ begin
     ExtraOptions := copy(Info.ExtraOptions,pos('-Ttext=',Info.ExtraOptions)+7,length(Info.ExtraOptions));
     for i := 1 to length(ExtraOptions) do
       if pos(copy(ExtraOptions,i,1),'0123456789abcdefxABCDEFX') = 0 then
+      begin
         ExtraOptions := copy(ExtraOptions,1,i);
+        break;
+      end;
     baseAddress := StrToIntDef(ExtraOptions,0);
   end;
 
