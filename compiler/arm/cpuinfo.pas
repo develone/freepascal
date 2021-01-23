@@ -3436,7 +3436,7 @@ Const
 
       { Raspberry rp2040 }
       (controllertypestr:'RP2040'          ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00000000;      srambase:$20000000; sramsize:$00042000),
-      (controllertypestr:'RASPIPICO'       ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00200000;      srambase:$20000000; sramsize:$00042000),
+      (controllertypestr:'RASPI_PICO'      ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00200000;      srambase:$20000000; sramsize:$00042000),
       (controllertypestr:'FEATHER_RP2040'  ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00400000;      srambase:$20000000; sramsize:$00042000),
       (controllertypestr:'ITZYBITZY_RP2040'; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00200000;      srambase:$20000000; sramsize:$00042000),
 
