@@ -542,7 +542,7 @@ procedure LCD_IRQHandler; external name 'LCD_IRQHandler';
 procedure USB_IRQHandler; external name 'USB_IRQHandler';
 
 
-{$i cortexm0_start.inc}
+{$i cortexm0p_start.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

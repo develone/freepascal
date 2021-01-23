@@ -566,7 +566,7 @@ procedure LPUART1_IRQHandler; external name 'LPUART1_IRQHandler';
 procedure AES_RNG_IRQHandler; external name 'AES_RNG_IRQHandler';
 
 
-{$i cortexm0_start.inc}
+{$i cortexm0p_start.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

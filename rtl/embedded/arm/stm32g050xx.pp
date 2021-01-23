@@ -506,7 +506,7 @@ procedure USART1_IRQHandler; external name 'USART1_IRQHandler';
 procedure USART2_IRQHandler; external name 'USART2_IRQHandler';
 
 
-{$i cortexm0_start.inc}
+{$i cortexm0p_start.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

@@ -401,7 +401,8 @@ ifeq ($(SUBARCH),armv6m)
 CPU_UNITS=lpc8xx lpc11xx lpc122x  nrf51 cortexm0
 CPU_UNITS+=stm32f030x6 stm32f030x8 stm32f030xc stm32f031x6 stm32f038xx stm32f042x6 stm32f048xx stm32f051x8 stm32f058xx stm32f070x6 stm32f070xb stm32f071xb stm32f072xb stm32f078xx stm32f091xc stm32f098xx 
 CPU_UNITS+=stm32g030xx stm32g031xx stm32g041xx stm32g050xx stm32g051xx stm32g061xx stm32g070xx stm32g071xx stm32g081xx stm32g0b0xx stm32g0b1xx stm32g0c1xx 
-CPU_UNITS+=stm32l010x4 stm32l010x6 stm32l010x8 stm32l010xb stm32l011xx stm32l021xx stm32l031xx stm32l041xx stm32l051xx stm32l052xx stm32l053xx stm32l062xx stm32l063xx stm32l071xx stm32l072xx stm32l073xx stm32l081xx stm32l082xx stm32l083xx 
+CPU_UNITS+=stm32l010x4 stm32l010x6 stm32l010x8 stm32l010xb stm32l011xx stm32l021xx stm32l031xx stm32l041xx stm32l051xx stm32l052xx stm32l053xx stm32l062xx stm32l063xx stm32l071xx stm32l072xx stm32l073xx stm32l081xx stm32l082xx stm32l083xx
+CPU_UNITS+=rp2040
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7a)

@@ -439,7 +439,7 @@ procedure USART2_IRQHandler; external name 'USART2_IRQHandler';
 procedure LPUART1_IRQHandler; external name 'LPUART1_IRQHandler';
 
 
-{$i cortexm0_start.inc}
+{$i cortexm0p_start.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;

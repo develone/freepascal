@@ -1710,6 +1710,11 @@ Type
       { Raspberry Pi 2 }
       ct_raspi2,
 
+      { Raspberry rp2040 }
+      ct_rp2040,
+      ct_rppico,
+      ct_featherrp2040,
+      ct_itzybitzyrp2040,
       // generic Thumb2 target
       ct_thumb2bare
      );
@@ -3428,6 +3433,12 @@ Const
       
       { Raspberry Pi 2 }
       (controllertypestr:'RASPI2'; controllerunitstr:'RASPI2'; cputype:cpu_armv7a; fputype:fpu_vfpv4; flashbase:$00000000; flashsize:$00000000; srambase:$00008000; sramsize:$10000000),
+
+      { Raspberry rp2040 }
+      (controllertypestr:'RP2040'          ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00000000;      srambase:$20000000; sramsize:$00042000),
+      (controllertypestr:'RASPIPICO'       ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00200000;      srambase:$20000000; sramsize:$00042000),
+      (controllertypestr:'FEATHER_RP2040'  ; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00400000;      srambase:$20000000; sramsize:$00042000),
+      (controllertypestr:'ITZYBITZY_RP2040'; controllerunitstr:'RP2040'; cputype:cpu_armv6m; fputype:fpu_soft; flashbase:$10000000; flashsize:$00200000;      srambase:$20000000; sramsize:$00042000),
 
       { Bare bones }
       (controllertypestr:'THUMB2_BARE';	controllerunitstr:'THUMB2_BARE';	cputype:cpu_armv7m; fputype:fpu_soft; flashbase:$00000000;	flashsize:$00002000;	srambase:$20000000;	sramsize:$00000400)

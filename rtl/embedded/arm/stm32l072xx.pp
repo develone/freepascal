@@ -559,7 +559,7 @@ procedure RNG_LPUART1_IRQHandler; external name 'RNG_LPUART1_IRQHandler';
 procedure USB_IRQHandler; external name 'USB_IRQHandler';
 
 
-{$i cortexm0_start.inc}
+{$i cortexm0p_start.inc}
 
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;
