@@ -387,6 +387,7 @@ CPU_UNITS+=stm32g431xx stm32g441xx stm32g471xx stm32g473xx stm32g474xx stm32g483
 CPU_UNITS+=stm32h723xx stm32h725xx stm32h730xx stm32h730xxq stm32h733xx stm32h735xx stm32h742xx stm32h743xx stm32h745xx stm32h747xx stm32h750xx stm32h753xx stm32h755xx stm32h757xx stm32h7a3xx stm32h7a3xxq stm32h7b0xx stm32h7b0xxq stm32h7b3xx stm32h7b3xxq 
 CPU_UNITS+=stm32l412xx stm32l422xx stm32l431xx stm32l432xx stm32l433xx stm32l442xx stm32l443xx stm32l451xx stm32l452xx stm32l462xx stm32l471xx stm32l475xx stm32l476xx stm32l485xx stm32l486xx stm32l496xx stm32l4a6xx stm32l4p5xx stm32l4q5xx stm32l4r5xx stm32l4r7xx stm32l4r9xx stm32l4s5xx stm32l4s7xx stm32l4s9xx 
 CPU_UNITS+=stm32wb30xx stm32wb35xx stm32wb50xx stm32wb55xx stm32wb5mxx 
+CPU_UNITS+=samd51g19a samd51j19a samd51p19a
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv4t)
@@ -402,7 +403,7 @@ CPU_UNITS=lpc8xx lpc11xx lpc122x  nrf51 cortexm0
 CPU_UNITS+=stm32f030x6 stm32f030x8 stm32f030xc stm32f031x6 stm32f038xx stm32f042x6 stm32f048xx stm32f051x8 stm32f058xx stm32f070x6 stm32f070xb stm32f071xb stm32f072xb stm32f078xx stm32f091xc stm32f098xx 
 CPU_UNITS+=stm32g030xx stm32g031xx stm32g041xx stm32g050xx stm32g051xx stm32g061xx stm32g070xx stm32g071xx stm32g081xx stm32g0b0xx stm32g0b1xx stm32g0c1xx 
 CPU_UNITS+=stm32l010x4 stm32l010x6 stm32l010x8 stm32l010xb stm32l011xx stm32l021xx stm32l031xx stm32l041xx stm32l051xx stm32l052xx stm32l053xx stm32l062xx stm32l063xx stm32l071xx stm32l072xx stm32l073xx stm32l081xx stm32l082xx stm32l083xx
-CPU_UNITS+=rp2040
+CPU_UNITS+=rp2040 samd21e18a samd21g18a samd21j18a
 CPU_UNITS_DEFINED=1
 endif
 ifeq ($(SUBARCH),armv7a)
