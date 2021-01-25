@@ -91,6 +91,7 @@ type
     procedure AddElementsFromList(L: TStrings; List: TFPList; UsePathName : Boolean = False);
     Procedure DoLog(Const Msg : String);
     Procedure DoLog(Const Fmt : String; Args : Array of const);
+    Procedure OutputResults(); virtual;
     procedure Warning(AContext: TPasElement; const AMsg: String);
     procedure Warning(AContext: TPasElement; const AMsg: String;
       const Args: array of const);
@@ -169,6 +170,9 @@ type
     procedure DescrEndTableRow; virtual; abstract;
     procedure DescrBeginTableCell; virtual; abstract;
     procedure DescrEndTableCell; virtual; abstract;
+    procedure PrepareDocumentation; virtual;
+    // Descendents must override this.
+    procedure DoWriteDocumentation; virtual; Abstract;
 
     Property CurrentContext : TPasElement Read FContext ;
   public
@@ -184,7 +188,8 @@ type
     Class Function FileNameExtension : String; virtual;
     Class Procedure Usage(List : TStrings); virtual;
     Class procedure SplitImport(var AFilename, ALinkPrefix: String); virtual;
-    procedure WriteDoc; virtual; Abstract;
+    // Here we start the generation of documentation
+    procedure WriteDocumentation;
     Function WriteDescr(Element: TPasElement) : TDocNode;
     procedure WriteDescr(Element: TPasElement; DocNode: TDocNode);
     procedure WriteDescr(AContext: TPasElement; DescrNode: TDOMElement); virtual;
@@ -250,14 +255,23 @@ Type
     FCurDirectory: String;
     FModule: TPasModule;
     FPageInfos: TFPObjectList;     // list of TPageInfo objects
+    FLinkUnresolvedCnt: Integer;
+    FOutputPageNames: TStringList;
+    function GetOutputPageNames: TStrings;
     function GetPageCount: Integer;
-
+    function LinkFix(ALink:String):String;
   Protected
     FAllocator: TFileAllocator;
-    function ResolveLinkID(const Name: String; Level: Integer=0): DOMString;
+    Procedure LinkUnresolvedInc();
+    // General resolving routine
+    function ResolveLinkID(const Name: String): DOMString;
+    // Simplified resolving routine. Excluded last path after dot
+    function ResolveLinkIDUnStrict(const Name: String): DOMString;
     function ResolveLinkIDInUnit(const Name,AUnitName: String): DOMString;
     function ResolveLinkWithinPackage(AElement: TPasElement; ASubpageIndex: Integer): String;
-    Function CreateAllocator : TFileAllocator; virtual; abstract;
+    procedure PrepareDocumentation; override;
+    function CreateAllocator() : TFileAllocator; virtual; abstract;
+    Procedure OutputResults(); override;
     // aFileName is the filename allocated by the Allocator, nothing prefixed.
     procedure WriteDocPage(const aFileName: String; aElement: TPasElement; aSubPageIndex: Integer); virtual; abstract;
     procedure AllocatePages; virtual;
@@ -272,18 +286,22 @@ Type
     function GetFileBaseDir(aOutput: String): String; virtual;
     function InterPretOption(const Cmd, Arg: String): boolean; override;
     function  ModuleHasClasses(AModule: TPasModule): Boolean;
+    // Allocate pages etc.
+    Procedure DoWriteDocumentation; override;
+    Function MustGeneratePage(aFileName : String) : Boolean; virtual;
+
     Property PageInfos : TFPObjectList Read FPageInfos;
     Property SubPageNames: Boolean Read FSubPageNames;
   Public
     constructor Create(APackage: TPasPackage; AEngine: TFPDocEngine); override;
     Destructor Destroy; override;
-    procedure WriteDoc; override;
     class procedure Usage(List: TStrings); override;
     property PageCount: Integer read GetPageCount;
     Property Allocator : TFileAllocator Read FAllocator;
     Property Module: TPasModule  Read FModule Write FModule;
     Property CurDirectory: String Read FCurDirectory Write FCurDirectory;    // relative to curdir of process
     property BaseDirectory: String read FBaseDirectory Write FBaseDirectory; // relative path to package base directory
+    Property OutputPageNames : TStrings Read GetOutputPageNames;
  end;
 
   TFPDocWriterClass = Class of TFPDocWriter;
@@ -314,7 +332,7 @@ function SortPasElements(Item1, Item2: Pointer): Integer;
 
 implementation
 
-uses fpdocstrs;
+uses strutils, fpdocstrs;
 
 function SortPasElements(Item1, Item2: Pointer): Integer;
 begin
@@ -389,6 +407,7 @@ begin
   inherited Create(APackage, AEngine);
   FPageInfos:=TFPObjectList.Create;
   FSubPageNames:= False;
+  FLinkUnresolvedCnt:=0;
 end;
 
 destructor TMultiFileDocWriter.Destroy;
@@ -403,23 +422,80 @@ begin
   Result := PageInfos.Count;
 end;
 
-function TMultiFileDocWriter.ResolveLinkID(const Name: String; Level : Integer = 0): DOMString;
+function TMultiFileDocWriter.GetOutputPageNames: TStrings;
+begin
+  If (FoutputPageNames=Nil) then
+    begin
+    FOutputPageNames:=TStringList.Create;
+    FOutputPageNames.Sorted:=True;
+    end;
+  Result:=FOutputPageNames;
+end;
 
+procedure TMultiFileDocWriter.OutputResults();
+begin
+  DoLog('Unresolved links: %d', [FLinkUnresolvedCnt]);
+  inherited OutputResults();
+end;
+
+procedure TMultiFileDocWriter.LinkUnresolvedInc();
+begin
+  Inc(FLinkUnresolvedCnt);
+end;
+
+function TMultiFileDocWriter.ResolveLinkID(const Name: String): DOMString;
 var
-  res,s: String;
+  res: String;
 
 begin
   res:=Engine.ResolveLink(Module,Name, True);
   // engine can return backslashes on Windows
+  res:= LinkFix(res);
+  Result:=UTF8Decode(res);
+end;
+
+function TMultiFileDocWriter.ResolveLinkIDUnStrict(const Name: String
+  ): DOMString;
+var
+  idDot, idLast: Integer;
+  res: String;
+begin
+  res:=Engine.ResolveLink(Module,Name, True);
+  if res = '' then
+  begin
+    // do simplify on one level from end.
+    // TOCO: I want to move that code to last check of Engine.ResolveLink() for not Strict
+    IdDot:= Pos('.', Name);
+    IdLast:= 0;
+    // search last dot
+    while idDot > 0 do
+    begin
+      IdLast:= idDot;
+      IdDot:= Pos('.', Name, IdLast+1);
+    end;
+    if idLast > 0 then
+      // have cut last element
+      res:= Engine.ResolveLink(Module, Copy(Name, 1, IdLast-1), True);
+  end;
+  res:= LinkFix(res);
+  Result:=UTF8Decode(res);
+end;
+
+function TMultiFileDocWriter.LinkFix(ALink: String): String;
+var
+  res, s:String;
+begin
+  res:= ALink;
   if Length(res) > 0 then
-   begin
-     s:=Copy(Res, 1, Length(CurDirectory) + 1);
+  begin
+    // If the link is in the same directory as current dir, then remove the directory part.
+    s:=Copy(res, 1, Length(CurDirectory) + 1);
     if (S= CurDirectory + '/') or (s= CurDirectory + '\') then
-      Res := Copy(Res, Length(CurDirectory) + 2, Length(Res))
-    else if not IsLinkAbsolute(Res) then
-      Res := BaseDirectory + Res;
-   end;
-  Result:=UTF8Decode(Res);
+      res := Copy(res, Length(CurDirectory) + 2, Length(res))
+    else if not IsLinkAbsolute(res) then
+      res := BaseDirectory + res;
+  end;
+  Result:= res;
 end;
 
 { Used for:
@@ -459,8 +535,15 @@ begin
     SetLength(Result, 0);
 end;
 
+procedure TMultiFileDocWriter.PrepareDocumentation;
+begin
+  inherited PrepareDocumentation;
+  FAllocator:= CreateAllocator();
+  FAllocator.SubPageNames:= SubPageNames;
+end;
 
-Function TMultiFileDocWriter.AddPage(AElement: TPasElement; ASubpageIndex: Integer) : TPageInfo;
+function TMultiFileDocWriter.AddPage(AElement: TPasElement;
+  ASubpageIndex: Integer): TPageInfo;
 
 begin
   Result:= TPageInfo.Create(aElement,aSubPageIndex);
@@ -508,7 +591,7 @@ begin
 end;
 
 
-Function TMultiFileDocWriter.ModuleHasClasses(AModule: TPasModule) : Boolean;
+function TMultiFileDocWriter.ModuleHasClasses(AModule: TPasModule): Boolean;
 
 begin
   result:=assigned(AModule)
@@ -551,7 +634,8 @@ begin
     end;
 end;
 
-Procedure TMultiFileDocWriter.AllocateClassMemberPages(AModule: TPasModule; LinkList : TObjectList);
+procedure TMultiFileDocWriter.AllocateClassMemberPages(AModule: TPasModule;
+  LinkList: TObjectList);
 var
   i, j, k: Integer;
   ClassEl: TPasClassType;
@@ -715,7 +799,7 @@ begin
     Result:=IncludeTrailingPathDelimiter(Result);
 end;
 
-procedure TMultiFileDocWriter.WriteDoc;
+procedure TMultiFileDocWriter.DoWriteDocumentation;
 
   procedure CreatePath(const AFilename: String);
 
@@ -748,8 +832,6 @@ var
   FinalFilename: String;
 
 begin
-  FAllocator:=CreateAllocator;
-  FAllocator.SubPageNames:= SubPageNames;
   AllocatePages;
   DoLog(SWritingPages, [PageCount]);
   if Engine.Output <> '' then
@@ -758,22 +840,59 @@ begin
      with TPageInfo(PageInfos[i]) do
        begin
        FileName:= Allocator.GetFilename(Element, SubpageIndex);
-       FinalFilename := GetFileBaseDir(Engine.Output) + FileName;
-       CreatePath(FinalFilename);
-       WriteDocPage(FileName,ELement,SubPageIndex);
+       if MustGeneratePage(FileName) then
+         begin
+         FinalFilename := GetFileBaseDir(Engine.Output) + FileName;
+         CreatePath(FinalFilename);
+         WriteDocPage(FileName,ELement,SubPageIndex);
+         end;
        end;
+end;
+
+function TMultiFileDocWriter.MustGeneratePage(aFileName: String): Boolean;
+begin
+  Result:=Not Assigned(FOutputPageNames);
+  if Not Result then
+    Result:=FOutputPageNames.IndexOf(aFileName)<>-1;
+  Writeln(afilename ,': ',result);
 end;
 
 class procedure TMultiFileDocWriter.Usage(List: TStrings);
 begin
   List.AddStrings(['--use-subpagenames', SUsageSubNames]);
+  List.AddStrings(['--only-pages=LIST', SUsageOnlyPages]);
 end;
 
 function TMultiFileDocWriter.InterPretOption(const Cmd, Arg: String): boolean;
+
+Var
+  I : Integer;
+  FN : String;
+
 begin
+  Writeln('Cmd : ',Cmd);
   Result := True;
   if Cmd = '--use-subpagenames' then
     FSubPageNames:= True
+  else
+  if Cmd = '--only-pages' then
+    begin
+    Result:=Arg<>'';
+    if Result then
+      begin
+      if Arg[1]='@' then
+        begin
+        FN:=Copy(Arg,2,Length(Arg)-1);
+        OutputPageNames.LoadFromFile(FN);
+        end
+      else
+        begin
+        For I:=1 to WordCount(Arg,[',']) do
+          OutputPageNames.Add(ExtractWord(I,Arg,[',']));
+        end;
+      Writeln('OutputPagenames ',OutputPagenames.CommaText);
+      end
+    end
   else
     Result:=inherited InterPretOption(Cmd, Arg);
 end;
@@ -1106,6 +1225,13 @@ begin
     end;
 end;
 
+procedure TFPDocWriter.WriteDocumentation;
+begin
+  PrepareDocumentation();
+  DoWriteDocumentation();
+  OutputResults();
+end;
+
 function TFPDocWriter.FindTopicElement ( Node: TDocNode ) : TTopicElement;
 
 Var
@@ -1127,6 +1253,11 @@ procedure TFPDocWriter.DescrWriteImageEl(const AFileName, ACaption,
 
 begin
   DoLog('%s : No support for images yet: %s (caption: "%s")',[ClassName,AFileName,ACaption]);
+end;
+
+procedure TFPDocWriter.PrepareDocumentation;
+begin
+  // Ancestors can call AllocatePages();CreateAllocator(); into base class
 end;
 
 { ---------------------------------------------------------------------
@@ -1484,6 +1615,11 @@ end;
 procedure TFPDocWriter.DoLog(const Fmt: String; Args: array of const);
 begin
   DoLog(Format(Fmt,Args));
+end;
+
+procedure TFPDocWriter.OutputResults();
+begin
+  DoLog('Documentation process finished.');
 end;
 
 function TFPDocWriter.ConvertExtShort(AContext: TPasElement;

@@ -3937,10 +3937,16 @@ end;
 { EPasResolve }
 
 procedure EPasResolve.SetPasElement(AValue: TPasElement);
+var
+  Old: TPasElement;
 begin
   if FPasElement=AValue then Exit;
-  if PasElement<>nil then
+  Old:=FPasElement;
+  if Old<>nil then
+    begin
+    Old:=nil;
     PasElement.Release{$IFDEF CheckPasTreeRefCount}('EPasResolve.SetPasElement'){$ENDIF};
+    end;
   FPasElement:=AValue;
   if PasElement<>nil then
     PasElement.AddRef{$IFDEF CheckPasTreeRefCount}('EPasResolve.SetPasElement'){$ENDIF};
@@ -7526,11 +7532,13 @@ procedure TPasResolver.FinishExceptOnExpr;
 var
   El: TPasImplExceptOn;
   ResolvedType: TPasResolverResult;
+  TypeEl: TPasType;
 begin
   CheckTopScope(TPasExceptOnScope);
   El:=TPasImplExceptOn(FTopScope.Element);
-  ComputeElement(El.TypeEl,ResolvedType,[rcType]);
-  CheckIsClass(El.TypeEl,ResolvedType);
+  TypeEl:=El.TypeEl;
+  ComputeElement(TypeEl,ResolvedType,[rcType]);
+  CheckIsClass(TypeEl,ResolvedType);
 end;
 
 procedure TPasResolver.FinishExceptOnStatement;
@@ -19128,19 +19136,19 @@ begin
     exit(cIncompatible);
   Params:=TParamsExpr(Expr);
 
-  // first param: bool, enum or char
+  // first param: bool, integer, enum or char
   Param:=Params.Params[0];
   ComputeElement(Param,ParamResolved,[]);
   Result:=cIncompatible;
   if rrfReadable in ParamResolved.Flags then
     begin
-    if ParamResolved.BaseType in (btAllBooleans+btAllChars) then
+    if ParamResolved.BaseType in btArrayRangeTypes then
       Result:=cExact
     else if (ParamResolved.BaseType=btContext) and (ParamResolved.LoTypeEl is TPasEnumType) then
       Result:=cExact
     else if ParamResolved.BaseType=btRange then
       begin
-      if ParamResolved.SubType in btAllBooleans+btAllChars then
+      if ParamResolved.SubType in btArrayRangeTypes then
         Result:=cExact
       else if ParamResolved.SubType=btContext then
         begin

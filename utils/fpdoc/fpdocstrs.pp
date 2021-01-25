@@ -170,12 +170,14 @@ resourcestring
   SUsageOption190  = '                  e.g. --package=fcl';
   SUsageOption200  = '--project=file    Use file as project file';
   SUsageOption210  = '--show-private    Show private methods.';
+  SUsageOption211  = '--fallback-seealso-links';
+  SUsageOption212  = '                  Simplify seealso links by exluding last link level';
   SUsageOption215  = '--stop-on-parser-error';
   SUsageOption215A = '                  Stop when a parser error occurs. Default is to ignore parser errors.';
   SUsageOption220  = '--warn-no-node    Warn if no documentation node was found.';
   SUsageOption221  = '--warn-documentation-empty    Warn if documentation is empty.';
   SUsageOption222  = '--warn-xct        Warn if an external class could not be resolved.';
-  SUsageOption223  = '--warn-used-file  Warn if an external class could not be resolved.';
+  SUsageOption223  = '--info-used-file  Output the file path of an implicitly processed file.';
   SUsageOption230  = '--mo-dir=dir      Set directory where language files reside to dir';
   SUsageOption240  = '--parse-impl      (Experimental) try to parse implementation too';
   SUsageOption250  = '--dont-trim       Do not trim XML contents. Useful for preserving';
@@ -187,6 +189,7 @@ resourcestring
   SUsageOption310  = '--write-project=file';
   SUsageOption320  = '                  Write all command-line options to a project file';
   SUsageSubNames   = 'Use the file subnames instead the indexes as postfixes';
+  SUsageOnlyPages  = 'Only write pages in LIST, LIST is comma-separated list of filenames or @filename where the named file contains 1 file per line.';
 
   SUsageFormats        = 'The following output formats are supported by this fpdoc:';
   SUsageBackendHelp    = 'Specify an output format, combined with --help to get more help for this backend.';
