@@ -2854,7 +2854,7 @@ begin
         success:=DoExec(FindUtil(utilsprefix+'objcopy'),'-O binary '+
           FixedExeFileName+' '+
           maybequoted(ScriptFixFileName(ChangeFileExt(current_module.exefilename,'.bin'))),true,false);
-        if success then
+        if success and (target_info.system in systems_support_uf2) and (cs_generate_uf2 in current_settings.globalswitches) then
           success := GenerateUF2(maybequoted(ScriptFixFileName(ChangeFileExt(current_module.exefilename,'.bin'))),
                                  maybequoted(ScriptFixFileName(ChangeFileExt(current_module.exefilename,'.uf2'))),
                                  embedded_controllers[current_settings.controllertype].flashbase);
@@ -2872,7 +2872,6 @@ function TLinkerEmbedded.postprocessexecutable(const fn : string;isdll:boolean):
   begin
     Result:=PostProcessELFExecutable(fn,isdll);
   end;
-
 
 function TlinkerEmbedded.GenerateUF2(binFile,uf2File : string;baseAddress : longWord):boolean;
 type 
@@ -2931,10 +2930,7 @@ begin
     ExtraOptions := copy(Info.ExtraOptions,pos('-Ttext=',Info.ExtraOptions)+7,length(Info.ExtraOptions));
     for i := 1 to length(ExtraOptions) do
       if pos(copy(ExtraOptions,i,1),'0123456789abcdefxABCDEFX') = 0 then
-      begin
         ExtraOptions := copy(ExtraOptions,1,i);
-        break;
-      end;
     baseAddress := StrToIntDef(ExtraOptions,0);
   end;
 
@@ -2948,6 +2944,7 @@ begin
   if (baseAddress and $07ffffff) <> 0 then
   begin
     totalRead := 0;
+    numRead := 0;
     assign(f,binfile);
     reset(f,1);
     assign(g,uf2file);
