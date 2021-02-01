@@ -287,6 +287,7 @@ begin
       Add('    _bss_end = . ;');
       Add('}');
       Add('_end = .;');
+      Add('end = _end;');
     end;
 {$endif ARM}
 
