@@ -300,6 +300,18 @@ type
     reset : longWord;
     wdsel : longWord;
     reset_done : longWord;
+    reserved0 : array[0..$3FF-$03] of longWord;
+    reset_togl : longWord;
+    wdsel_togl : longWord;
+    reset_done_togl : longWord;
+    reserved1 : array[0..$3FF-$03] of longWord;
+    reset_set : longWord;
+    wdsel_set : longWord;
+    reset_done_set : longWord;
+    reserved2 : array[0..$3FF-$03] of longWord;
+    reset_clr : longWord;
+    wdsel_clr : longWord;
+    reset_done_clr : longWord;
   end;
 
   TROSC_Registers = record
@@ -430,6 +442,13 @@ type
     proc_in_sync_bypass_hi : longWord;
     dbgforce : longWord;
     mempowerdown : longWord;
+  end;
+
+  TSYSINFO_Registers = record
+    chip_id : longWord;
+    platform : longWord;
+    reserved0 : array[0..$3F-$08] of longWord;
+    gitref_rp2040 : longWord;
   end;
 
   TTIMER_Registers = record
@@ -629,15 +648,15 @@ const
   PPB_BASE        = $e0000000;
 
 var
-  //SysInfo : TSysInfo_Registers absolute SYSINFO_BASE;
+  SysInfo : TSysInfo_Registers absolute SYSINFO_BASE;
   SysCfg : TSYSCFG_REGISTERS absolute SYSCFG_BASE;
   Clocks : TCLOCKS_Registers absolute CLOCKS_BASE;
   Resets : TRESETS_Registers absolute RESETS_BASE;
   PSM : TPSM_Registers absolute PSM_BASE;
   IOBANK0 : TIOBANK0_Registers absolute IO_BANK0_BASE;
   IOQSPI : TIOQSPI_Registers absolute IO_QSPI_BASE;
-  //PADS_BANK0_BASE = $4001c000
-  //PADS_QSPI_BASE = $40020000 
+  PADSBANK0 : TPADSBANK0_Registers absolute PADS_BANK0_BASE;
+  PADSQSPI : TPADSQSPI_Registers absolute PADS_QSPI_BASE;
   XOSC : TXOSC_Registers absolute XOSC_BASE;
   PLLSYS : TPLL_Registers absolute PLL_SYS_BASE;
   PLLUSB : TPLL_Registers absolute PLL_USB_BASE;
@@ -654,8 +673,7 @@ var
   WATCHDOG : TWATCHDOG_Registers absolute WATCHDOG_BASE;
   RTC : TRTC_Registers absolute RTC_BASE;
   ROSC : TROSC_Registers absolute ROSC_BASE;
-  //VREG_AND_CHIP_RESET_BASE = $40064000
-  //TBMAN_BASE = $4006c000
+  VREGANDCHIPRESET : TVREGANDCHIPRESET_Registers absolute VREG_AND_CHIP_RESET_BASE;
   DMA : TDMA_Registers absolute DMA_BASE;
   //USBCTRL_BASE = $50100000
   //USBCTRL_DPRAM_BASE = $50100000
@@ -664,7 +682,6 @@ var
   PIO1 : TPIO_Registers absolute PIO1_BASE;
   //XIP_AUX_BASE = $50400000
   SIO : TSIO_Registers absolute SIO_BASE;
-  //PPB_BASE = $e00000
 
 implementation
 
@@ -705,6 +722,138 @@ procedure RTC_IRQHandler; external name 'RTC_IRQHandler';
 procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;
 asm
+  .section ".init.secondstageboot"
+  .long  0x4B2FB500
+  .long  0x60582021
+  .long  0x21026898
+  .long  0x60984388
+  .long  0x611860D8
+  .long  0x4B2B6158
+  .long  0x60992100
+  .long  0x61592102
+  .long  0x22F02101
+  .long  0x49285099
+  .long  0x21016019
+  .long  0x20356099
+  .long  0xF83EF000
+  .long  0x42902202
+  .long  0x2106D014
+  .long  0xF0006619
+  .long  0x6E19F82E
+  .long  0x66192101
+  .long  0x66182000
+  .long  0xF000661A
+  .long  0x6E19F826
+  .long  0x6E196E19
+  .long  0xF0002005
+  .long  0x2101F829
+  .long  0xD1F94208
+  .long  0x60992100
+  .long  0x60194918
+  .long  0x60592100
+  .long  0x48184917
+  .long  0x21016001
+  .long  0x21EB6099
+  .long  0x21A06619
+  .long  0xF0006619
+  .long  0x2100F80C
+  .long  0x49136099
+  .long  0x60014811
+  .long  0x60992101
+  .long  0x2800BC01
+  .long  0x4810D100
+  .long  0xB5034700
+  .long  0x20046A99
+  .long  0xD0FB4201
+  .long  0x42012001
+  .long  0xBD03D1F8
+  .long  0x6618B502
+  .long  0xF7FF6618
+  .long  0x6E18FFF2
+  .long  0xBD026E18
+  .long  0x40020000
+  .long  0x18000000
+  .long  0x00070000
+  .long  0x005F0300
+  .long  0x00002221
+  .long  0x180000F4
+  .long  0xA0002022
+  .long  0x10000101
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x602A273E
+
+  .section ".init.morestuff"
+  .long  0xE0004827
+  .long  0x49272000
+  .long  0xC8066088
+  .long  0x8808F381
+  .long  0x48254710
+  .long  0x28006800
+  .long  0xA412D139
+  .long  0x2900CC0E
+  .long  0xF000D002
+  .long  0xE7F9F812
+  .long  0x4A214920
+  .long  0xE0002000
+  .long  0x4291C101
+  .long  0x491FD1FC
+  .long  0x491F4788
+  .long  0x491F4788
+  .long  0xBE004788
+  .long  0xC901E7FD
+  .long  0x429AC201
+  .long  0x4770D3FB
+  .long  0x7188EBF2
+  .long  0x10002780
+  .long  0x1000279C
+  .long  0x10000164
+  .long  0xE71AA390
+  .long  0x1000279C
+  .long  0x200000C0
+  .long  0x20000A5C
+  .long  0x10003138
+  .long  0x20040000
+  .long  0x20040000
+  .long  0x10003138
+  .long  0x20041000
+  .long  0x20041000
+  .long  0x00000000
+  .long  0x480C4770
+  .long  0xFC8AF001
+  .long  0xF3EF4700
+  .long  0xB2C08005
+  .long  0x00004770
+  .long  0x10000200
+  .long  0xE000ED00
+  .long  0xD0000000
+  .long  0x20000A5C
+  .long  0x20000D30
+  .long  0x10001241
+  .long  0x10000321
+  .long  0x10001361
+  .long  0x00005657
+  .long  0x50520006
+  .long  0x5360B3AB
+  .long  0x10002758
+  .long  0x50520006
+  .long  0x02031C86
+  .long  0x10002768
+  .long  0x50520006
+  .long  0x9DA22254
+  .long  0x10002770
+  .long  0x50520005
+  .long  0x68F465DE
+  .long  0x10003138
+  .long  0x00000000
+  .long  0x00000000
+  .long  0x00000000
+
   .section ".init.interrupt_vectors"
   interrupt_vectors:
   .long _stack_top
