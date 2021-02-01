@@ -92,23 +92,23 @@ type
     reserved0 : array[0..$3FF-$0A] of longWord;
     priority_togl : longWord;
     priority_ack_togl : longWord;
-    perf : array[0..3] of record
-      ctr_togl : longWord;
-      sel_togl : longWord;
+    perf_togl : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
     end;
     reserved1 : array[0..$3FF-$0A] of longWord;
     priority_set : longWord;
     priority_ack_set : longWord;
-    perf : array[0..3] of record
-      ctr_set : longWord;
-      sel_set : longWord;
+    perf_set : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
     end;
     reserved2 : array[0..$3FF-$0A] of longWord;
     priority_clr : longWord;
     priority_ack_clr : longWord;
-    perf : array[0..3] of record
-      ctr_clr : longWord;
-      sel_clr : longWord;
+    perf_clr : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
     end;
   end;
 
@@ -148,7 +148,7 @@ type
     src_togl : longWord;
     status_togl : longWord;
     result_togl : longWord;
-    reserved0 : array[0..$3FF-$08] of longWord;
+    reserved1 : array[0..$3FF-$08] of longWord;
     ref_khz_set : longWord;
     min_khz_set : longWord;
     max_khz_set : longWord;
@@ -157,7 +157,7 @@ type
     src_set : longWord;
     status_set : longWord;
     result_set : longWord;
-    reserved0 : array[0..$3FF-$08] of longWord;
+    reserved2 : array[0..$3FF-$08] of longWord;
     ref_khz_clr : longWord;
     min_khz_clr : longWord;
     max_khz_clr : longWord;
