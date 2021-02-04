@@ -375,6 +375,7 @@ ifeq ($(ARCH),arm)
 CPU_SPECIFIC_COMMON_UNITS=sysutils math classes fgl macpas typinfo types rtlconsts getopts lineinfo
 ifeq ($(SUBARCH),armv7m)
 CPU_UNITS=lm3fury lm3tempest       lpc13xx lpc1768 lm4f120 sam3x8e xmc4500 cortexm3 cortexm4 # thumb2_bare
+CPU_UNITS+=stm32f10x_cl stm32f10x_conn stm32f10x_hd stm32f10x_ld stm32f10x_md stm32f10x_xl
 CPU_UNITS+=stm32f100xb stm32f100xe stm32f101x6 stm32f101xb stm32f101xe stm32f101xg stm32f102x6 stm32f102xb stm32f103x6 stm32f103xb stm32f103xe stm32f103xg stm32f105xc stm32f107xc 
 CPU_UNITS+=stm32l100xb stm32l100xba stm32l100xc stm32l151xb stm32l151xba stm32l151xc stm32l151xca stm32l151xd stm32l151xdx stm32l151xe stm32l152xb stm32l152xba stm32l152xc stm32l152xca stm32l152xd stm32l152xdx stm32l152xe stm32l162xc stm32l162xca stm32l162xd stm32l162xdx stm32l162xe 
 CPU_UNITS_DEFINED=1

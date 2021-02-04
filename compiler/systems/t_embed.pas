@@ -349,6 +349,43 @@ begin
       ct_at91sam7x256,
       ct_at91sam7xc256,
 
+      //Old Stuff for compatibility
+      ct_stm32f100x4, // LD&MD value line, 4=16,6=32,8=64,b=128
+      ct_stm32f100x6,
+      ct_stm32f100x8,
+      ct_stm32f100xB,
+      ct_stm32f100xC, // HD value line, r=512,d=384,c=256
+      ct_stm32f100xD,
+      ct_stm32f100xE,
+      ct_stm32f101x4, // LD Access line, 4=16,6=32
+      ct_stm32f101x6,
+      ct_stm32f101x8, // MD Access line, 8=64,B=128
+      ct_stm32f101xB,
+      ct_stm32f101xC, // HD Access line, C=256,D=384,E=512
+      ct_stm32f101xD,
+      ct_stm32f101xE,
+      ct_stm32f101xF, // XL Access line, F=768,G=1M
+      ct_stm32f101xG,
+      ct_stm32f102x4, // LD usb access line, 4=16,6=32
+      ct_stm32f102x6,
+      ct_stm32f102x8, // MD usb access line, 8=64,B=128
+      ct_stm32f102xB,
+      ct_stm32f103x4, // LD performance line, 4=16,6=32
+      ct_stm32f103x6,
+      ct_stm32f103x8, // MD performance line, 8=64,B=128
+      ct_stm32f103xB,
+      ct_stm32f103xC, // HD performance line, C=256,D=384,E=512
+      ct_stm32f103xD,
+      ct_stm32f103xE,
+      ct_stm32f103xF, // XL performance line, F=768,G=1M
+      ct_stm32f103xG,
+      ct_stm32f105x8,
+      ct_stm32f105xb,
+      ct_stm32f105xc,
+      ct_stm32f107x8, // MD and HD connectivity line, 8=64,B=128,C=256
+      ct_stm32f107xB,
+      ct_stm32f107xC,
+
       { ST Microelectronics f0 family }
       ct_stm32f030c6,
       ct_stm32f030c8,
