@@ -50,6 +50,36 @@ type
     inte : longWord;
     intf : longWord;
     ints : longWord;
+    reserved0 : array[0..$3FF-$09] of longWord;
+    cs_togl : longWord;
+    result_togl : longWord;
+    fcs_togl : longWord;
+    fifo_togl : longWord;
+    &div_togl : longWord;
+    intr_togl : longWord;
+    inte_togl : longWord;
+    intf_togl : longWord;
+    ints_togl : longWord;
+    reserved1 : array[0..$3FF-$09] of longWord;
+    cs_set : longWord;
+    result_set : longWord;
+    fcs_set : longWord;
+    fifo_set : longWord;
+    &div_set : longWord;
+    intr_set : longWord;
+    inte_set : longWord;
+    intf_set : longWord;
+    ints_set : longWord;
+    reserved2 : array[0..$3FF-$09] of longWord;
+    cs_clr : longWord;
+    result_clr : longWord;
+    fcs_clr : longWord;
+    fifo_clr : longWord;
+    &div_clr : longWord;
+    intr_clr : longWord;
+    inte_clr : longWord;
+    intf_clr : longWord;
+    ints_clr : longWord;
   end;
 
   TBUSCTRL_Registers = record
@@ -59,12 +89,45 @@ type
       ctr : longWord;
       sel : longWord;
     end;
+    reserved0 : array[0..$3FF-$0A] of longWord;
+    priority_togl : longWord;
+    priority_ack_togl : longWord;
+    perf_togl : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
+    end;
+    reserved1 : array[0..$3FF-$0A] of longWord;
+    priority_set : longWord;
+    priority_ack_set : longWord;
+    perf_set : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
+    end;
+    reserved2 : array[0..$3FF-$0A] of longWord;
+    priority_clr : longWord;
+    priority_ack_clr : longWord;
+    perf_clr : array[0..3] of record
+      ctr : longWord;
+      sel : longWord;
+    end;
   end;
 
   TCLOCK_Registers = record
     ctrl : longWord;
     &div : longWord;
     selected : longWord;
+    reserved0 : array[0..$3FF-$03] of longWord;
+    ctrl_togl : longWord;
+    &div_togl : longWord;
+    selected_togl : longWord;
+    reserved1 : array[0..$3FF-$03] of longWord;
+    ctrl_set : longWord;
+    &div_set : longWord;
+    selected_set : longWord;
+    reserved2 : array[0..$3FF-$03] of longWord;
+    ctrl_clr : longWord;
+    &div_clr : longWord;
+    selected_clr : longWord;
   end;
 
   TFC_Registers = record
@@ -76,6 +139,33 @@ type
     src : longWord;
     status : longWord;
     result : longWord;
+    reserved0 : array[0..$3FF-$08] of longWord;
+    ref_khz_togl : longWord;
+    min_khz_togl : longWord;
+    max_khz_togl : longWord;
+    delay_togl : longWord;
+    interval_togl : longWord;
+    src_togl : longWord;
+    status_togl : longWord;
+    result_togl : longWord;
+    reserved1 : array[0..$3FF-$08] of longWord;
+    ref_khz_set : longWord;
+    min_khz_set : longWord;
+    max_khz_set : longWord;
+    delay_set : longWord;
+    interval_set : longWord;
+    src_set : longWord;
+    status_set : longWord;
+    result_set : longWord;
+    reserved2 : array[0..$3FF-$08] of longWord;
+    ref_khz_clr : longWord;
+    min_khz_clr : longWord;
+    max_khz_clr : longWord;
+    delay_clr : longWord;
+    interval_clr : longWord;
+    src_clr : longWord;
+    status_clr : longWord;
+    result_clr : longWord;
   end;
 
   TCLOCKS_Registers = record
