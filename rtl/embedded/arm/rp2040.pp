@@ -50,36 +50,6 @@ type
     inte : longWord;
     intf : longWord;
     ints : longWord;
-    reserved0 : array[0..$3FF-$09] of longWord;
-    cs_togl : longWord;
-    result_togl : longWord;
-    fcs_togl : longWord;
-    fifo_togl : longWord;
-    &div_togl : longWord;
-    intr_togl : longWord;
-    inte_togl : longWord;
-    intf_togl : longWord;
-    ints_togl : longWord;
-    reserved1 : array[0..$3FF-$09] of longWord;
-    cs_set : longWord;
-    result_set : longWord;
-    fcs_set : longWord;
-    fifo_set : longWord;
-    &div_set : longWord;
-    intr_set : longWord;
-    inte_set : longWord;
-    intf_set : longWord;
-    ints_set : longWord;
-    reserved2 : array[0..$3FF-$09] of longWord;
-    cs_clr : longWord;
-    result_clr : longWord;
-    fcs_clr : longWord;
-    fifo_clr : longWord;
-    &div_clr : longWord;
-    intr_clr : longWord;
-    inte_clr : longWord;
-    intf_clr : longWord;
-    ints_clr : longWord;
   end;
 
   TBUSCTRL_Registers = record
@@ -89,45 +59,12 @@ type
       ctr : longWord;
       sel : longWord;
     end;
-    reserved0 : array[0..$3FF-$0A] of longWord;
-    priority_togl : longWord;
-    priority_ack_togl : longWord;
-    perf_togl : array[0..3] of record
-      ctr : longWord;
-      sel : longWord;
-    end;
-    reserved1 : array[0..$3FF-$0A] of longWord;
-    priority_set : longWord;
-    priority_ack_set : longWord;
-    perf_set : array[0..3] of record
-      ctr : longWord;
-      sel : longWord;
-    end;
-    reserved2 : array[0..$3FF-$0A] of longWord;
-    priority_clr : longWord;
-    priority_ack_clr : longWord;
-    perf_clr : array[0..3] of record
-      ctr : longWord;
-      sel : longWord;
-    end;
   end;
 
   TCLOCK_Registers = record
     ctrl : longWord;
     &div : longWord;
     selected : longWord;
-    reserved0 : array[0..$3FF-$03] of longWord;
-    ctrl_togl : longWord;
-    &div_togl : longWord;
-    selected_togl : longWord;
-    reserved1 : array[0..$3FF-$03] of longWord;
-    ctrl_set : longWord;
-    &div_set : longWord;
-    selected_set : longWord;
-    reserved2 : array[0..$3FF-$03] of longWord;
-    ctrl_clr : longWord;
-    &div_clr : longWord;
-    selected_clr : longWord;
   end;
 
   TFC_Registers = record
@@ -139,33 +76,6 @@ type
     src : longWord;
     status : longWord;
     result : longWord;
-    reserved0 : array[0..$3FF-$08] of longWord;
-    ref_khz_togl : longWord;
-    min_khz_togl : longWord;
-    max_khz_togl : longWord;
-    delay_togl : longWord;
-    interval_togl : longWord;
-    src_togl : longWord;
-    status_togl : longWord;
-    result_togl : longWord;
-    reserved1 : array[0..$3FF-$08] of longWord;
-    ref_khz_set : longWord;
-    min_khz_set : longWord;
-    max_khz_set : longWord;
-    delay_set : longWord;
-    interval_set : longWord;
-    src_set : longWord;
-    status_set : longWord;
-    result_set : longWord;
-    reserved2 : array[0..$3FF-$08] of longWord;
-    ref_khz_clr : longWord;
-    min_khz_clr : longWord;
-    max_khz_clr : longWord;
-    delay_clr : longWord;
-    interval_clr : longWord;
-    src_clr : longWord;
-    status_clr : longWord;
-    result_clr : longWord;
   end;
 
   TCLOCKS_Registers = record
@@ -390,18 +300,6 @@ type
     reset : longWord;
     wdsel : longWord;
     reset_done : longWord;
-    reserved0 : array[0..$3FF-$03] of longWord;
-    reset_togl : longWord;
-    wdsel_togl : longWord;
-    reset_done_togl : longWord;
-    reserved1 : array[0..$3FF-$03] of longWord;
-    reset_set : longWord;
-    wdsel_set : longWord;
-    reset_done_set : longWord;
-    reserved2 : array[0..$3FF-$03] of longWord;
-    reset_clr : longWord;
-    wdsel_clr : longWord;
-    reset_done_clr : longWord;
   end;
 
   TROSC_Registers = record
@@ -813,46 +711,49 @@ procedure Vectors; assembler; nostackframe;
 label interrupt_vectors;
 asm
   .section ".init.secondstageboot"
-  .long  0x4B2FB500
+  .long  0x4B32B500
   .long  0x60582021
   .long  0x21026898
   .long  0x60984388
   .long  0x611860D8
-  .long  0x4B2B6158
+  .long  0x4B2E6158
   .long  0x60992100
   .long  0x61592102
   .long  0x22F02101
-  .long  0x49285099
+  .long  0x492B5099
   .long  0x21016019
   .long  0x20356099
-  .long  0xF83EF000
+  .long  0xF844F000
   .long  0x42902202
   .long  0x2106D014
   .long  0xF0006619
-  .long  0x6E19F82E
+  .long  0x6E19F834
   .long  0x66192101
   .long  0x66182000
   .long  0xF000661A
-  .long  0x6E19F826
+  .long  0x6E19F82C
   .long  0x6E196E19
   .long  0xF0002005
-  .long  0x2101F829
+  .long  0x2101F82F
   .long  0xD1F94208
   .long  0x60992100
-  .long  0x60194918
+  .long  0x6019491B
   .long  0x60592100
-  .long  0x48184917
+  .long  0x481B491A
   .long  0x21016001
   .long  0x21EB6099
   .long  0x21A06619
   .long  0xF0006619
-  .long  0x2100F80C
-  .long  0x49136099
-  .long  0x60014811
+  .long  0x2100F812
+  .long  0x49166099
+  .long  0x60014814
   .long  0x60992101
   .long  0x2800BC01
-  .long  0x4810D100
-  .long  0xB5034700
+  .long  0x4700D000
+  .long  0x49134812
+  .long  0xC8036008
+  .long  0x8808F380
+  .long  0xB5034708
   .long  0x20046A99
   .long  0xD0FB4201
   .long  0x42012001
@@ -868,81 +769,12 @@ asm
   .long  0x00002221
   .long  0x180000F4
   .long  0xA0002022
-  .long  0x10000101
+  .long  0x10000100
+  .long  0xE000ED08
   .long  0x00000000
   .long  0x00000000
   .long  0x00000000
-  .long  0x00000000
-  .long  0x00000000
-  .long  0x00000000
-  .long  0x00000000
-  .long  0x602A273E
-
-  .section ".init.morestuff"
-  .long  0xE0004827
-  .long  0x49272000
-  .long  0xC8066088
-  .long  0x8808F381
-  .long  0x48254710
-  .long  0x28006800
-  .long  0xA412D139
-  .long  0x2900CC0E
-  .long  0xF000D002
-  .long  0xE7F9F812
-  .long  0x4A214920
-  .long  0xE0002000
-  .long  0x4291C101
-  .long  0x491FD1FC
-  .long  0x491F4788
-  .long  0x491F4788
-  .long  0xBE004788
-  .long  0xC901E7FD
-  .long  0x429AC201
-  .long  0x4770D3FB
-  .long  0x7188EBF2
-  .long  0x10002780
-  .long  0x1000279C
-  .long  0x10000164
-  .long  0xE71AA390
-  .long  0x1000279C
-  .long  0x200000C0
-  .long  0x20000A5C
-  .long  0x10003138
-  .long  0x20040000
-  .long  0x20040000
-  .long  0x10003138
-  .long  0x20041000
-  .long  0x20041000
-  .long  0x00000000
-  .long  0x480C4770
-  .long  0xFC8AF001
-  .long  0xF3EF4700
-  .long  0xB2C08005
-  .long  0x00004770
-  .long  0x10000200
-  .long  0xE000ED00
-  .long  0xD0000000
-  .long  0x20000A5C
-  .long  0x20000D30
-  .long  0x10001241
-  .long  0x10000321
-  .long  0x10001361
-  .long  0x00005657
-  .long  0x50520006
-  .long  0x5360B3AB
-  .long  0x10002758
-  .long  0x50520006
-  .long  0x02031C86
-  .long  0x10002768
-  .long  0x50520006
-  .long  0x9DA22254
-  .long  0x10002770
-  .long  0x50520005
-  .long  0x68F465DE
-  .long  0x10003138
-  .long  0x00000000
-  .long  0x00000000
-  .long  0x00000000
+  .long  0x7A4EB274
 
   .section ".init.interrupt_vectors"
   interrupt_vectors:
