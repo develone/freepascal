@@ -112,7 +112,7 @@ asm
   ldr r1, .Ltext_start
   str r1, [r0]
 
-{$if defined(FPC_ABI_EABIHF)}
+{$if not defined(FPUSOFT)}
   ldr r0, .Lcpacr
   ldr r1, [r0]
   orr r1, r1, #0xf00000
