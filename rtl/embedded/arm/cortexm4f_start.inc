@@ -112,6 +112,15 @@ asm
   ldr r1, .Ltext_start
   str r1, [r0]
 
+{$if defined(FPC_ABI_EABIHF)}
+  ldr r0, .Lcpacr
+  ldr r1, [r0]
+  orr r1, r1, #0xf00000
+  str r1, [r0]
+  dsb
+  isb
+{$endif}
+
   bl PASCALMAIN
   b HaltProc
   .balign 4
@@ -127,6 +136,8 @@ asm
   .long _edata
 .Lvtor:
   .long 0xE000ED08
+.Lcpacr:
+  .long 0xE000ED88
 .Ltext_start:
   .long _text_start
 end;
