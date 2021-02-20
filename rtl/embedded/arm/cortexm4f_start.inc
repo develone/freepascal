@@ -112,14 +112,14 @@ asm
   ldr r1, .Ltext_start
   str r1, [r0]
 
-{$if not defined(FPUSOFT)}
+{$if defined(FPUARM_HAS_VFP_EXTENSION)}
   ldr r0, .Lcpacr
   ldr r1, [r0]
   orr r1, r1, #0xf00000
   str r1, [r0]
   dsb
   isb
-{$endif}
+{$endif defined(FPUARM_HAS_VFP_EXTENSION)}
 
   bl PASCALMAIN
   b HaltProc
@@ -134,10 +134,12 @@ asm
   .long _data
 .L_edata:
   .long _edata
-.Lvtor:
-  .long 0xE000ED08
+{$if defined(FPUARM_HAS_VFP_EXTENSION)}
 .Lcpacr:
   .long 0xE000ED88
+{$endif defined(FPUARM_HAS_VFP_EXTENSION)}
+.Lvtor:
+  .long 0xE000ED08
 .Ltext_start:
   .long _text_start
 end;
