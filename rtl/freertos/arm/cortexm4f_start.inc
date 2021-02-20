@@ -9,9 +9,80 @@ var
 
 procedure Pascalmain; external name 'PASCALMAIN';
 
+procedure _NonMaskableInt_Handler; assembler; nostackframe; public name '_NonMaskableInt_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _HardFault_Handler; assembler; nostackframe; public name '_HardFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _MemoryManagement_Handler; assembler; nostackframe; public name '_MemoryManagement_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _BusFault_Handler; assembler; nostackframe; public name '_BusFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _UsageFault_Handler; assembler; nostackframe; public name '_UsageFault_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVC_Handler; assembler; nostackframe; public name '_SVC_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SVCall_Handler; assembler; nostackframe; public name '_SVCall_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _DebugMonitor_Handler; assembler; nostackframe; public name '_DebugMonitor_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _PendSV_Handler; assembler; nostackframe; public name '_PendSV_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
+procedure _SysTick_Handler; assembler; nostackframe; public name '_SysTick_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
 procedure HaltProc; assembler; nostackframe; public name'_haltproc';
 asm
 .Lloop:
+   bkpt
    b .Lloop
 end;
 
@@ -37,11 +108,9 @@ asm
   strls r0,[r1],#4
   bls .Lzeroloop
 
-{$ifdef REMAP_VECTTAB}
   ldr r0, .Lvtor
   ldr r1, .Ltext_start
   str r1, [r0]
-{$endif REMAP_VECTTAB}
 
 {$if defined(FPUARM_HAS_VFP_EXTENSION)}
   ldr r0, .Lcpacr
@@ -51,9 +120,10 @@ asm
   dsb
   isb
 {$endif defined(FPUARM_HAS_VFP_EXTENSION)}
+
   bl PASCALMAIN
   b HaltProc
-
+  .balign 4
 .L_bss_start:
   .long _bss_start
 .L_bss_end:
@@ -64,14 +134,12 @@ asm
   .long _data
 .L_edata:
   .long _edata
-{$if not defined(FPUARM_HAS_VFP_EXTENSION)}
+{$if defined(FPUARM_HAS_VFP_EXTENSION)}
 .Lcpacr:
   .long 0xE000ED88
 {$endif defined(FPUARM_HAS_VFP_EXTENSION)}
-{$ifdef REMAP_VECTTAB}
 .Lvtor:
   .long 0xE000ED08
 .Ltext_start:
   .long _text_start
-{$endif REMAP_VECTTAB}
 end;
