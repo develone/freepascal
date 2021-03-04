@@ -1872,8 +1872,10 @@ begin
       { Raspberry rp2040 }
       ct_rp2040,
       ct_rppico,
-      ct_featherrp2040,
-      ct_itzybitzyrp2040,
+      ct_feather_rp2040,
+      ct_itzybitzy_rp2040,
+      ct_tiny_2040,
+      ct_qtpy_rp2040,
 
       ct_thumb2bare:
         begin
