@@ -315,6 +315,14 @@ function do_isdevice(handle:thandle):boolean;forward;
   {$define SYSPROCDEFINED}
 {$endif cpuz80}
 
+{$ifdef cpuwasm32}
+  {$ifdef SYSPROCDEFINED}
+    {$Error Can't determine processor type !}
+  {$endif}
+  {$i wasm32.inc}  { Case dependent, don't change }
+  {$define SYSPROCDEFINED}
+{$endif cpuwasm32}
+
 {$ifndef SYSPROCDEFINED}
   {$Error Can't determine processor type !}
 {$endif}
@@ -1058,8 +1066,7 @@ type
   end;
   TInitFinalTable = record
     TableCount,
-    InitCount  : {$if defined(VER2)}longint
-                 {$elseif defined(VER3_0)}sizeint
+    InitCount  : {$if defined(VER3_0)}sizeint
                  {$else}ALUUInt{$endif}
                  ;
     Procs      : array[1..maxunits] of TInitFinalRec;

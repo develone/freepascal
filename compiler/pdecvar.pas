@@ -360,8 +360,8 @@ implementation
          { Generate temp procdefs to search for matching read/write
            procedures. the readprocdef will store all definitions }
          paranr:=0;
-         readprocdef:=cprocdef.create(normal_function_level,true);
-         writeprocdef:=cprocdef.create(normal_function_level,true);
+         readprocdef:=cprocdef.create(normal_function_level,false);
+         writeprocdef:=cprocdef.create(normal_function_level,false);
 
          readprocdef.struct:=astruct;
          writeprocdef.struct:=astruct;
@@ -857,11 +857,23 @@ implementation
                message1(parser_e_implements_uses_non_implemented_interface,def.typename);
            until not try_to_consume(_COMMA);
 
-         { remove unneeded procdefs }
-         if readprocdef.proctypeoption<>potype_propgetter then
-           readprocdef.owner.deletedef(readprocdef);
-         if writeprocdef.proctypeoption<>potype_propsetter then
-           writeprocdef.owner.deletedef(writeprocdef);
+         { register propgetter and propsetter procdefs }
+         if assigned(current_module) and current_module.in_interface then
+           begin
+             if readprocdef.proctypeoption=potype_propgetter then
+               readprocdef.register_def
+             else
+               readprocdef.free;
+             if writeprocdef.proctypeoption=potype_propsetter then
+               writeprocdef.register_def
+             else
+               writeprocdef.free;
+           end
+         else
+           begin
+             readprocdef.free;
+             writeprocdef.free;
+           end;
 
          result:=p;
       end;
@@ -1633,6 +1645,7 @@ implementation
          is_first_type: boolean;
 {$endif powerpc or powerpc64}
          old_block_type: tblock_type;
+         tmpidx: Integer;
       begin
          old_block_type:=block_type;
          block_type:=bt_var;
@@ -2003,6 +2016,10 @@ implementation
 
               trecordsymtable(recst).insertunionst(Unionsymtable,offset);
               uniondef.owner.deletedef(uniondef);
+              { this prevents a dangling pointer and use after free }
+              tmpidx:=current_module.deflist.IndexOfItem(uniondef,FromEnd);
+              if tmpidx<>-1 then
+                current_module.deflist[tmpidx]:=nil;
            end;
          { free the list }
          sc.free;

@@ -2387,6 +2387,7 @@ type
       EvalLow: boolean; ErrorEl: TPasElement): TResEvalValue; virtual; // compute low() or high()
     function EvalTypeRange(Decl: TPasType; Flags: TResEvalFlags): TResEvalValue; virtual; // compute low() and high()
     function HasTypeInfo(El: TPasType): boolean; virtual;
+    function IsAnonymousElType(El: TPasType): boolean; virtual;
     function GetActualBaseType(bt: TResolverBaseType): TResolverBaseType; virtual;
     function GetCombinedBoolean(Bool1, Bool2: TResolverBaseType; ErrorEl: TPasElement): TResolverBaseType; virtual;
     function GetCombinedInt(const Int1, Int2: TPasResolverResult; ErrorEl: TPasElement): TResolverBaseType; virtual;
@@ -5487,7 +5488,9 @@ begin
             if (Proc.Visibility=visStrictPrivate)
                 or ((Proc.Visibility=visPrivate)
                   and (Proc.GetModule<>Data^.Proc.GetModule)) then
-              // a private private is hidden by definition -> no hint
+              // a private method is hidden by definition -> no hint
+            else if (Proc.Visibility=visPublished) then
+              // a published can hide (used for overloading rtti) -> no hint
             else if (ProcScope.ImplProc<>nil)  // not abstract, external
                 and (not ProcHasImplElements(ProcScope.ImplProc)) then
               // hidden method has implementation, but no statements -> useless
@@ -6229,16 +6232,54 @@ begin
 end;
 
 procedure TPasResolver.FinishSubElementType(Parent: TPasElement; El: TPasType);
+
+  procedure InsertInFront(NewParent: TPasElement; List: TFPList
+    {$IFDEF CheckPasTreeRefCount};const aId: string{$ENDIF});
+  var
+    i: Integer;
+    p, Prev: TPasElement;
+  begin
+    p:=El.Parent;
+    if NewParent=p.Parent then
+      begin
+      // e.g. m,n:array of longint; -> insert n$a in front of m
+      i:=List.Count-1;
+      while (i>=0) and (List[i]<>Pointer(p)) do
+        dec(i);
+      if P is TPasVariable then
+        begin
+        while (i>0) do
+          begin
+          Prev:=TPasElement(List[i-1]);
+          if (Prev.ClassType=P.ClassType) and (TPasVariable(Prev).VarType=TPasVariable(P).VarType) then
+            dec(i) // e.g. m,n: array of longint
+          else
+            break;
+          end;
+        end;
+      if i<0 then
+        List.Add(El)
+      else
+        List.Insert(i,El);
+      end
+    else
+      begin
+      List.Add(El);
+      end;
+    El.AddRef{$IFDEF CheckPasTreeRefCount}(aID){$ENDIF};
+    El.Parent:=NewParent;
+  end;
+
 var
   Decl: TPasDeclarations;
   EnumScope: TPasEnumTypeScope;
+  p: TPasElement;
+  MembersType: TPasMembersType;
 begin
   EmitTypeHints(Parent,El);
   if (El.Name<>'') or (AnonymousElTypePostfix='') then exit;
   if Parent.Name='' then
     RaiseMsg(20170415165455,nCannotNestAnonymousX,sCannotNestAnonymousX,[GetElementTypeName(El)],El);
-  if not (Parent.Parent is TPasDeclarations) then
-    RaiseMsg(20170416094735,nCannotNestAnonymousX,sCannotNestAnonymousX,[GetElementTypeName(El)],El);
   if El.Parent<>Parent then
     RaiseNotYetImplemented(20190215085011,Parent);
   // give anonymous sub type a name
@@ -6246,11 +6287,27 @@ begin
   {$IFDEF VerbosePasResolver}
   writeln('TPasResolver.FinishSubElementType parent="',GetObjName(Parent),'" named anonymous type "',GetObjName(El),'"');
   {$ENDIF}
-  Decl:=TPasDeclarations(Parent.Parent);
-  Decl.Declarations.Add(El);
-  El.AddRef{$IFDEF CheckPasTreeRefCount}('TPasDeclarations.Declarations'){$ENDIF};
-  El.Parent:=Decl;
-  Decl.Types.Add(El);
+
+  p:=Parent.Parent;
+  repeat
+    if p is TPasDeclarations then
+      begin
+      Decl:=TPasDeclarations(p);
+      InsertInFront(Decl,Decl.Declarations{$IFDEF CheckPasTreeRefCount},'TPasDeclarations.Declarations'{$ENDIF});
+      Decl.Types.Add(El);
+      break;
+      end
+    else if p is TPasMembersType then
+      begin
+      MembersType:=TPasMembersType(p);
+      InsertInFront(MembersType,MembersType.Members{$IFDEF CheckPasTreeRefCount},'TPasMembersType.Members'{$ENDIF});
+      break;
+      end
+    else
+      p:=p.Parent;
+    if p=nil then
+      RaiseMsg(20170416094735,nCannotNestAnonymousX,sCannotNestAnonymousX,[GetElementTypeName(El)],El);
+  until false;
   if (El.ClassType=TPasEnumType) and (Parent.ClassType=TPasSetType) then
     begin
     // anonymous enumtype
@@ -7819,6 +7876,8 @@ begin
     CheckUseAsType(El.VarType,20190123095916,El);
     if El.Expr<>nil then
       CheckAssignCompatibility(El,El.Expr,true);
+    if El.VarType.Parent=El then
+      FinishSubElementType(El,El.VarType);
     end
   else if El.Expr<>nil then
     begin
@@ -10538,6 +10597,9 @@ end;
 
 procedure TPasResolver.ResolveBinaryExpr(El: TBinaryExpr;
   Access: TResolvedRefAccess);
+var
+  Left, Next: TPasExpr;
+  Bin: TBinaryExpr;
 begin
   {$IFDEF VerbosePasResolver}
   //writeln('TPasResolver.ResolveBinaryExpr left=',GetObjName(El.left),' right=',GetObjName(El.right),' opcode=',OpcodeStrings[El.OpCode]);
@@ -10564,7 +10626,26 @@ begin
         RaiseNotYetImplemented(20160922163456,El);
         end;
     end;
-  eopAdd,
+  eopAdd:
+    begin
+    Left:=El.left;
+    while (Left.ClassType=TBinaryExpr) do
+      begin
+      Bin:=TBinaryExpr(Left);
+      if Bin.OpCode<>eopAdd then break;
+      Next:=TBinaryExpr(Left).left;
+      if Next.Parent<>Left then
+        RaiseNotYetImplemented(20210321201257,Left);
+      Left:=Next;
+      end;
+    ResolveExpr(Left,rraRead);
+    repeat
+      Bin:=TBinaryExpr(Left.Parent);
+      if Bin.right<>nil then
+        ResolveExpr(Bin.right,rraRead);
+      Left:=Bin;
+    until Left=El;
+    end;
   eopSubtract,
   eopMultiply,
   eopDivide,
@@ -12278,12 +12359,17 @@ begin
   {$ENDIF}
   if not (TopScope is TPasIdentifierScope) then
     RaiseInvalidScopeForElement(20160929205732,El);
-  AddIdentifier(TPasIdentifierScope(TopScope),El.Name,El,pikSimple);
+  if El.Name<>'' then
+    AddIdentifier(TPasIdentifierScope(TopScope),El.Name,El,pikSimple)
+  else
+    begin
+    // anonymous enumtype
+    end;
   EnumScope:=TPasEnumTypeScope(PushScope(El,TPasEnumTypeScope));
   // add canonical set
   if El.Parent is TPasSetType then
     begin
-    // anonymous enumtype, e.g. "set of ()"
+    // set of anonymous enumtype, e.g. "set of ()"
     CanonicalSet:=TPasSetType(El.Parent);
     CanonicalSet.AddRef{$IFDEF CheckPasTreeRefCount}('TPasEnumTypeScope.CanonicalSet'){$ENDIF};
     end
@@ -12887,6 +12973,8 @@ procedure TPasResolver.ComputeBinaryExpr(Bin: TBinaryExpr; out
   StartEl: TPasElement);
 var
   LeftResolved, RightResolved: TPasResolverResult;
+  Left: TPasExpr;
+  SubBin: TBinaryExpr;
 begin
   if (Bin.OpCode=eopSubIdent)
   or ((Bin.OpCode=eopNone) and (Bin.left is TInheritedExpr)) then
@@ -12906,11 +12994,36 @@ begin
     exit;
     end;
 
-  ComputeElement(Bin.left,LeftResolved,Flags-[rcNoImplicitProc],StartEl);
-  ComputeElement(Bin.right,RightResolved,Flags-[rcNoImplicitProc],StartEl);
-  // ToDo: check operator overloading
+  if Bin.OpCode=eopAdd then
+    begin
+    // handle multi-adds without stack
+    Left:=Bin.left;
+    while Left.ClassType=TBinaryExpr do
+      begin
+      SubBin:=TBinaryExpr(Left);
+      if SubBin.OpCode<>eopAdd then break;
+      Left:=SubBin.left;
+      end;
+    // Left is now left-most of multi add
+    ComputeElement(Left,LeftResolved,Flags-[rcNoImplicitProc],StartEl);
+    repeat
+      SubBin:=TBinaryExpr(Left.Parent);
+      ComputeElement(Bin.right,RightResolved,Flags-[rcNoImplicitProc],StartEl);
 
-  ComputeBinaryExprRes(Bin,ResolvedEl,Flags,LeftResolved,RightResolved);
+      // ToDo: check operator overloading
+      ComputeBinaryExprRes(SubBin,ResolvedEl,Flags,LeftResolved,RightResolved);
+      LeftResolved:=ResolvedEl;
+      Left:=SubBin;
+    until Left=Bin;
+    end
+  else
+    begin
+    ComputeElement(Bin.left,LeftResolved,Flags-[rcNoImplicitProc],StartEl);
+    ComputeElement(Bin.right,RightResolved,Flags-[rcNoImplicitProc],StartEl);
+
+    // ToDo: check operator overloading
+    ComputeBinaryExprRes(Bin,ResolvedEl,Flags,LeftResolved,RightResolved);
+    end;
 end;
 
 procedure TPasResolver.ComputeBinaryExprRes(Bin: TBinaryExpr; out
@@ -17834,7 +17947,7 @@ begin
 
   if GenEl.Body<>nil then
     begin
-    // implementation proc
+    // implementation or anonymous proc
     if SpecializedItem<>nil then
       SpecializedItem.Step:=prssImplementationBuilding;
     GenBody:=GenEl.Body;
@@ -18322,11 +18435,21 @@ begin
 end;
 
 procedure TPasResolver.SpecializeProcedureExpr(GenEl, SpecEl: TProcedureExpr);
+var
+  GenProc: TPasAnonymousProcedure;
+  NewClass: TPTreeElement;
 begin
   SpecializeExpr(GenEl,SpecEl);
-  if GenEl.Proc=nil then
+  GenProc:=GenEl.Proc;
+  if GenProc=nil then
     RaiseNotYetImplemented(20190808221018,GenEl);
-  RaiseNotYetImplemented(20190808221040,GenEl);
+  if not (GenProc is TPasAnonymousProcedure) then
+    RaiseNotYetImplemented(20210331224052,GenEl);
+  if GenProc.Parent<>GenEl then
+    RaiseNotYetImplemented(20210331223856,GenEl);
+  NewClass:=TPTreeElement(GenProc.ClassType);
+  SpecEl.Proc:=TPasAnonymousProcedure(NewClass.Create(GenProc.Name,SpecEl));
+  SpecializeElement(GenProc,SpecEl.Proc);
 end;
 
 procedure TPasResolver.SpecializeResString(GenEl, SpecEl: TPasResString);
@@ -21051,8 +21174,8 @@ begin
       writeln('TPasResolver.FindElement searching scope "',CurName,'" RightPath="',RightPath,'" ...');
     {AllowWriteln-}
     {$ENDIF}
-    if not IsValidIdent(CurName) then
-      RaiseNotYetImplemented(20170328000033,ErrorEl,CurName);
+    // Note: CurName can be a non Pascal name, when specializing an autogenerated anonymous type
+    //if not IsValidIdent(CurName) then ;
     if CurScopeEl<>nil then
       begin
       NeedPop:=true;
@@ -29073,20 +29196,23 @@ function TPasResolver.IsTGUID(RecTypeEl: TPasRecordType): boolean;
 var
   Members: TFPList;
   El: TPasElement;
+  i, MemberIndex: Integer;
 begin
   Result:=false;
   if not SameText(RecTypeEl.Name,'TGUID') then exit;
   if SameText(RecTypeEl.GetModule.Name,'system') then exit(true);
   Members:=RecTypeEl.Members;
-  if Members.Count<4 then exit;
-  El:=TPasElement(Members[0]);
-  if not SameText(El.Name,'D1') then exit;
-  El:=TPasElement(Members[1]);
-  if not SameText(El.Name,'D2') then exit;
-  El:=TPasElement(Members[2]);
-  if not SameText(El.Name,'D3') then exit;
-  El:=TPasElement(Members[3]);
-  if not SameText(El.Name,'D4') then exit;
+  i:=1;
+  for MemberIndex:=0 to Members.Count-1 do
+    begin
+    El:=TPasElement(Members[MemberIndex]);
+    if (El.ClassType<>TPasVariable) then continue;
+    if SameText(El.Name,'D'+IntToStr(i)) then
+      begin
+      if i=4 then exit(true);
+      inc(i);
+      end;
+    end;
   Result:=true;
 end;
 
@@ -29566,6 +29692,37 @@ begin
   else if El.Parent is TPasAnonymousProcedure then
     exit;
   Result:=true;
+end;
+
+function TPasResolver.IsAnonymousElType(El: TPasType): boolean;
+// e.g. b$a$a
+var
+  aName: String;
+  i, l: SizeInt;
+  j: Integer;
+begin
+  Result:=false;
+  if AnonymousElTypePostfix='' then exit;
+  aName:=El.Name;
+  l:=length(AnonymousElTypePostfix);
+  i:=length(aName);
+  repeat
+    dec(i,l);
+    if i>0 then
+      begin
+      j:=i;
+      while (j<=l) and (aName[i+j]=AnonymousElTypePostfix[j]) do inc(j);
+      if j>l then
+        begin
+        Result:=true;
+        continue;
+        end;
+      end;
+    if not Result then exit; // no postfix
+    // at least one anonymous eltype postfix
+    Result:=IsValidIdent(LeftStr(aName,i+l));
+    exit;
+  until false;
 end;
 
 function TPasResolver.GetActualBaseType(bt: TResolverBaseType

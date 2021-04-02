@@ -656,6 +656,7 @@ type
     EVCTRL       : longWord;             //002C Event Input Control
     PMUX         : array[0..15] of byte;  //0030 Peripheral Multiplexing
     PINCFG       : array[0..31] of byte;  //0040 Pin Configuration
+    Res          : array[$60..$7F] of byte;
   end;
 
   TPORT_Registers = record
