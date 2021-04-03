@@ -1921,6 +1921,19 @@ begin
     begin
       Add('SECTIONS');
       Add('{');
+      if (embedded_controllers[current_settings.controllertype].controllerunitstr='RP2040') then
+      begin
+        Add('    .boot2 :');
+        Add('    {');
+        Add('    _boot2_start = .;');
+        Add('    KEEP(*(.boot2))');
+        Add('    ASSERT(!( . == _boot2_start ), "RP2040: Error, a device specific 2nd stage bootloader is required for booting");');
+        Add('    ASSERT(( . == _boot2_start + 256 ), "RP2040: Error, 2nd stage bootloader in section .boot2 is required to be 256 bytes");');
+        if embedded_controllers[current_settings.controllertype].flashsize<>0 then
+          Add('    } >flash')
+        else
+          Add('    } >ram');
+      end;
       Add('     .text :');
       Add('    {');
       Add('    _text_start = .;');
