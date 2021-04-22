@@ -9,6 +9,7 @@ unit esp8266;
   interface
 
 {$linklib esp8266, static}
+{$linklib util,static}
 {$linklib log, static}
 {$linklib c_fnano, static}
 {$linklib newlib, static}
@@ -28,6 +29,10 @@ unit esp8266;
 {$linklib pp, static}
 {$linklib stdc++, static}
 {$linklib pthread, static}
+{$linklib wpa, static}
+{$linklib wpa_supplicant, static}
+{$linklib lwip, static}
+{$linklib mbedtls, static}
 
   implementation
 
