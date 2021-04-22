@@ -140,6 +140,7 @@ const
 
 
   suppported_targets_x_smallr = systems_linux + systems_solaris + systems_android
+                             + systems_openbsd
                              + [system_i386_haiku,system_x86_64_haiku]
                              + [system_i386_beos]
                              + [system_m68k_amiga];
@@ -2760,6 +2761,13 @@ begin
                           IllegalPara(opt);
                       end;
 {$if defined(m68k)}
+                    'L':
+                      begin
+                        if (target_info.system in [system_m68k_sinclairql]) then
+                          sinclairql_vlink_experimental:=true
+                        else
+                          IllegalPara(opt);
+                      end;
                     'Q':
                       begin
                         if (target_info.system in [system_m68k_sinclairql]) then
@@ -3592,7 +3600,7 @@ begin
     system_m68k_amiga:
       target_unsup_features:=[f_dynlibs];
     system_m68k_sinclairql:
-      target_unsup_features:=[f_threading,f_dynlibs,f_commandargs,f_exitcode];
+      target_unsup_features:=[f_threading,f_dynlibs];
     system_z80_zxspectrum:
       target_unsup_features:=[f_threading,f_dynlibs{,f_fileio,f_textio},f_commandargs,f_exitcode];
     system_z80_msxdos:
@@ -4450,10 +4458,10 @@ begin
       Message(option_w_unsupported_debug_format);
 
   { switch assembler if it's binary and we got -a on the cmdline }
-  if ((cs_asm_leave in init_settings.globalswitches) and
-     (af_outputbinary in target_asm.flags)) or
-     { if -s is passed, we shouldn't call the internal assembler }
-     (cs_asm_extern in init_settings.globalswitches) then
+  if (af_outputbinary in target_asm.flags) and
+     ((cs_asm_leave in init_settings.globalswitches) or
+      { if -s is passed, we shouldn't call the internal assembler }
+      (cs_asm_extern in init_settings.globalswitches)) then
    begin
      Message(option_switch_bin_to_src_assembler);
 {$ifdef llvm}

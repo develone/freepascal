@@ -10628,6 +10628,7 @@ begin
     end;
   eopAdd:
     begin
+    // handle multi add
     Left:=El.left;
     while (Left.ClassType=TBinaryExpr) do
       begin
@@ -12994,6 +12995,7 @@ begin
     exit;
     end;
 
+  Flags:=Flags-[rcNoImplicitProc,rcNoImplicitProcType];
   if Bin.OpCode=eopAdd then
     begin
     // handle multi-adds without stack
@@ -13005,10 +13007,10 @@ begin
       Left:=SubBin.left;
       end;
     // Left is now left-most of multi add
-    ComputeElement(Left,LeftResolved,Flags-[rcNoImplicitProc],StartEl);
+    ComputeElement(Left,LeftResolved,Flags,StartEl);
     repeat
       SubBin:=TBinaryExpr(Left.Parent);
-      ComputeElement(Bin.right,RightResolved,Flags-[rcNoImplicitProc],StartEl);
+      ComputeElement(SubBin.right,RightResolved,Flags,StartEl);
 
       // ToDo: check operator overloading
       ComputeBinaryExprRes(SubBin,ResolvedEl,Flags,LeftResolved,RightResolved);
@@ -13018,8 +13020,8 @@ begin
     end
   else
     begin
-    ComputeElement(Bin.left,LeftResolved,Flags-[rcNoImplicitProc],StartEl);
-    ComputeElement(Bin.right,RightResolved,Flags-[rcNoImplicitProc],StartEl);
+    ComputeElement(Bin.left,LeftResolved,Flags,StartEl);
+    ComputeElement(Bin.right,RightResolved,Flags,StartEl);
 
     // ToDo: check operator overloading
     ComputeBinaryExprRes(Bin,ResolvedEl,Flags,LeftResolved,RightResolved);
