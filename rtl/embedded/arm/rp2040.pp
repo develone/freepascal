@@ -673,43 +673,37 @@ var
 
 implementation
 
-procedure NonMaskableInt_Handler; external name 'NonMaskableInt_Handler';
+procedure NMI_Handler; external name 'NMI_Handler';
 procedure HardFault_Handler; external name 'HardFault_Handler';
 procedure SVC_Handler; external name 'SVC_Handler';
 procedure PendSV_Handler; external name 'PendSV_Handler';
 procedure SysTick_Handler; external name 'SysTick_Handler';
-procedure isr_irq0;  external name 'isr_irq0';
-procedure isr_irq1;  external name 'isr_irq1';
-procedure isr_irq2;  external name 'isr_irq2';
-procedure isr_irq3;  external name 'isr_irq3';
-procedure isr_irq4;  external name 'isr_irq4';
-procedure isr_irq5;  external name 'isr_irq5';
-procedure isr_irq6;  external name 'isr_irq6';
-procedure isr_irq7;  external name 'isr_irq7';
-procedure isr_irq8;  external name 'isr_irq8';
-procedure isr_irq9;  external name 'isr_irq9';
-procedure isr_irq10; external name 'isr_irq10';
-procedure isr_irq11; external name 'isr_irq11';
-procedure isr_irq12; external name 'isr_irq12';
-procedure isr_irq13; external name 'isr_irq13';
-procedure isr_irq14; external name 'isr_irq14';
-procedure isr_irq15; external name 'isr_irq15';
-procedure isr_irq16; external name 'isr_irq16';
-procedure isr_irq17; external name 'isr_irq17';
-procedure isr_irq18; external name 'isr_irq18';
-procedure isr_irq19; external name 'isr_irq19';
-procedure isr_irq20; external name 'isr_irq20';
-procedure isr_irq21; external name 'isr_irq21';
-procedure isr_irq22; external name 'isr_irq22';
-procedure isr_irq23; external name 'isr_irq23';
-procedure isr_irq24; external name 'isr_irq24';
-procedure isr_irq25; external name 'isr_irq25';
-procedure isr_irq26; external name 'isr_irq26';
-procedure isr_irq27; external name 'isr_irq27';
-procedure isr_irq28; external name 'isr_irq28';
-procedure isr_irq29; external name 'isr_irq29';
-procedure isr_irq30; external name 'isr_irq30';
-procedure isr_irq31; external name 'isr_irq31';
+procedure TIMER_IRQ_0_Handler;  external name 'TIMER_IRQ_0_Handler';
+procedure TIMER_IRQ_1_Handler;  external name 'TIMER_IRQ_1_Handler';
+procedure TIMER_IRQ_2_Handler;  external name 'TIMER_IRQ_2_Handler';
+procedure TIMER_IRQ_3_Handler;  external name 'TIMER_IRQ_3_Handler';
+procedure PWM_IRQ_WRAP_Handler;  external name 'PWM_IRQ_WRAP_Handler';
+procedure USBCTRL_IRQ_Handler;  external name 'USBCTRL_IRQ_Handler';
+procedure XIP_IRQ_Handler;  external name 'XIP_IRQ_Handler';
+procedure PIO0_IRQ_0_Handler;  external name 'PIO0_IRQ_0_Handler';
+procedure PIO0_IRQ_1_Handler;  external name 'PIO0_IRQ_1_Handler';
+procedure PIO1_IRQ_0_Handler;  external name 'PIO1_IRQ_0_Handler';
+procedure PIO1_IRQ_1_Handler; external name 'PIO1_IRQ_1_Handler';
+procedure DMA_IRQ_0_Handler; external name 'DMA_IRQ_0_Handler';
+procedure DMA_IRQ_1_Handler; external name 'DMA_IRQ_1_Handler';
+procedure IO_IRQ_BANK0_Handler; external name 'IO_IRQ_BANK0_Handler';
+procedure IO_IRQ_QSPI_Handler; external name 'IO_IRQ_QSPI_Handler';
+procedure SIO_IRQ_PROC0_Handler; external name 'SIO_IRQ_PROC0_Handler';
+procedure SIO_IRQ_PROC1_Handler; external name 'SIO_IRQ_PROC1_Handler';
+procedure CLOCKS_IRQ_Handler; external name 'CLOCKS_IRQ_Handler';
+procedure SPI0_IRQ_Handler; external name 'SPI0_IRQ_Handler';
+procedure SPI1_IRQ_Handler; external name 'SPI1_IRQ_Handler';
+procedure UART0_IRQ_Handler; external name 'UART0_IRQ_Handler';
+procedure UART1_IRQ_Handler; external name 'UART1_IRQ_Handler';
+procedure ADC_IRQ_FIFO_Handler; external name 'ADC_IRQ_FIFO_Handler';
+procedure I2C0_IRQ_Handler; external name 'I2C0_IRQ_Handler';
+procedure I2C1_IRQ_Handler; external name 'I2C1_IRQ_Handler';
+procedure RTC_IRQ_Handler; external name 'RTC_IRQ_Handler';
 
 {$i cortexm0p_start.inc}
 
@@ -720,7 +714,7 @@ asm
   interrupt_vectors:
   .long _stack_top
   .long Startup
-  .long NonMaskableInt_Handler
+  .long NMI_Handler
   .long HardFault_Handler
   .long 0
   .long 0
@@ -734,116 +728,103 @@ asm
   .long 0
   .long PendSV_Handler
   .long SysTick_Handler
-  .long isr_irq0
-  .long isr_irq1
-  .long isr_irq2
-  .long isr_irq3
-  .long isr_irq4
-  .long isr_irq5
-  .long isr_irq6
-  .long isr_irq7
-  .long isr_irq8
-  .long isr_irq9
-  .long isr_irq10
-  .long isr_irq11
-  .long isr_irq12
-  .long isr_irq13
-  .long isr_irq14
-  .long isr_irq15
-  .long isr_irq16
-  .long isr_irq17
-  .long isr_irq18
-  .long isr_irq19
-  .long isr_irq20
-  .long isr_irq21
-  .long isr_irq22
-  .long isr_irq23
-  .long isr_irq24
-  .long isr_irq25
-  .long isr_irq26
-  .long isr_irq27
-  .long isr_irq28
-  .long isr_irq29
-  .long isr_irq30
-  .long isr_irq31
+  .long TIMER_IRQ_0_Handler
+  .long TIMER_IRQ_1_Handler
+  .long TIMER_IRQ_2_Handler
+  .long TIMER_IRQ_3_Handler
+  .long PWM_IRQ_WRAP_Handler
+  .long USBCTRL_IRQ_Handler
+  .long XIP_IRQ_Handler
+  .long PIO0_IRQ_0_Handler
+  .long PIO0_IRQ_1_Handler
+  .long PIO1_IRQ_0_Handler
+  .long PIO1_IRQ_1_Handler
+  .long DMA_IRQ_0_Handler
+  .long DMA_IRQ_1_Handler
+  .long IO_IRQ_BANK0_Handler
+  .long IO_IRQ_QSPI_Handler
+  .long SIO_IRQ_PROC0_Handler
+  .long SIO_IRQ_PROC1_Handler
+  .long CLOCKS_IRQ_Handler
+  .long SPI0_IRQ_Handler
+  .long SPI1_IRQ_Handler
+  .long UART0_IRQ_Handler
+  .long UART1_IRQ_Handler
+  .long ADC_IRQ_FIFO_Handler
+  .long I2C0_IRQ_Handler
+  .long I2C1_IRQ_Handler
+  .long RTC_IRQ_Handler
+  .long 0
+  .long 0
+  .long 0
+  .long 0
+  .long 0
+  .long 0
 
 
-  .weak NonMaskableInt_Handler
+  .weak NMI_Handler
   .weak HardFault_Handler
   .weak SVC_Handler
   .weak PendSV_Handler
   .weak SysTick_Handler
-  .weak isr_irq0
-  .weak isr_irq1
-  .weak isr_irq2
-  .weak isr_irq3
-  .weak isr_irq4
-  .weak isr_irq5
-  .weak isr_irq6
-  .weak isr_irq7
-  .weak isr_irq8
-  .weak isr_irq9
-  .weak isr_irq10
-  .weak isr_irq11
-  .weak isr_irq12
-  .weak isr_irq13
-  .weak isr_irq14
-  .weak isr_irq15
-  .weak isr_irq16
-  .weak isr_irq17
-  .weak isr_irq18
-  .weak isr_irq19
-  .weak isr_irq20
-  .weak isr_irq21
-  .weak isr_irq22
-  .weak isr_irq23
-  .weak isr_irq24
-  .weak isr_irq25
-  .weak isr_irq26
-  .weak isr_irq27
-  .weak isr_irq28
-  .weak isr_irq29
-  .weak isr_irq30
-  .weak isr_irq31
+  .weak TIMER_IRQ_0_Handler
+  .weak TIMER_IRQ_1_Handler
+  .weak TIMER_IRQ_2_Handler
+  .weak TIMER_IRQ_3_Handler
+  .weak PWM_IRQ_WRAP_Handler
+  .weak USBCTRL_IRQ_Handler
+  .weak XIP_IRQ_Handler
+  .weak PIO0_IRQ_0_Handler
+  .weak PIO0_IRQ_1_Handler
+  .weak PIO1_IRQ_0_Handler
+  .weak PIO1_IRQ_1_Handler
+  .weak DMA_IRQ_0_Handler
+  .weak DMA_IRQ_1_Handler
+  .weak IO_IRQ_BANK0_Handler
+  .weak IO_IRQ_QSPI_Handler
+  .weak SIO_IRQ_PROC0_Handler
+  .weak SIO_IRQ_PROC1_Handler
+  .weak CLOCKS_IRQ_Handler
+  .weak SPI0_IRQ_Handler
+  .weak SPI1_IRQ_Handler
+  .weak UART0_IRQ_Handler
+  .weak UART1_IRQ_Handler
+  .weak ADC_IRQ_FIFO_Handler
+  .weak I2C0_IRQ_Handler
+  .weak I2C1_IRQ_Handler
+  .weak RTC_IRQ_Handler
 
-  .set NonMaskableInt_Handler, _NonMaskableInt_Handler
+  .set NMI_Handler, _NMI_Handler
   .set HardFault_Handler, _HardFault_Handler
   .set SVC_Handler, _SVC_Handler
   .set PendSV_Handler, _PendSV_Handler
   .set SysTick_Handler, _SysTick_Handler
-  .set isr_irq0, Haltproc
-  .set isr_irq1, Haltproc
-  .set isr_irq2, Haltproc
-  .set isr_irq3, Haltproc
-  .set isr_irq4, Haltproc
-  .set isr_irq5, Haltproc
-  .set isr_irq6, Haltproc
-  .set isr_irq7, Haltproc
-  .set isr_irq8, Haltproc
-  .set isr_irq9, Haltproc
-  .set isr_irq10, Haltproc
-  .set isr_irq11, Haltproc
-  .set isr_irq12, Haltproc
-  .set isr_irq13, Haltproc
-  .set isr_irq14, Haltproc
-  .set isr_irq15, Haltproc
-  .set isr_irq16, Haltproc
-  .set isr_irq17, Haltproc
-  .set isr_irq18, Haltproc
-  .set isr_irq19, Haltproc
-  .set isr_irq20, Haltproc
-  .set isr_irq21, Haltproc
-  .set isr_irq22, Haltproc
-  .set isr_irq23, Haltproc
-  .set isr_irq24, Haltproc
-  .set isr_irq25, Haltproc
-  .set isr_irq26, Haltproc
-  .set isr_irq27, Haltproc
-  .set isr_irq28, Haltproc
-  .set isr_irq29, Haltproc
-  .set isr_irq30, Haltproc
-  .set isr_irq31, Haltproc
-
+  .set TIMER_IRQ_0_Handler, Haltproc
+  .set TIMER_IRQ_1_Handler, Haltproc
+  .set TIMER_IRQ_2_Handler, Haltproc
+  .set TIMER_IRQ_3_Handler, Haltproc
+  .set PWM_IRQ_WRAP_Handler, Haltproc
+  .set USBCTRL_IRQ_Handler, Haltproc
+  .set XIP_IRQ_Handler, Haltproc
+  .set PIO0_IRQ_0_Handler, Haltproc
+  .set PIO0_IRQ_1_Handler, Haltproc
+  .set PIO1_IRQ_0_Handler, Haltproc
+  .set PIO1_IRQ_1_Handler, Haltproc
+  .set DMA_IRQ_0_Handler, Haltproc
+  .set DMA_IRQ_1_Handler, Haltproc
+  .set IO_IRQ_BANK0_Handler, Haltproc
+  .set IO_IRQ_QSPI_Handler, Haltproc
+  .set SIO_IRQ_PROC0_Handler, Haltproc
+  .set SIO_IRQ_PROC1_Handler, Haltproc
+  .set CLOCKS_IRQ_Handler, Haltproc
+  .set SPI0_IRQ_Handler, Haltproc
+  .set SPI1_IRQ_Handler, Haltproc
+  .set UART0_IRQ_Handler, Haltproc
+  .set UART1_IRQ_Handler, Haltproc
+  .set ADC_IRQ_FIFO_Handler, Haltproc
+  .set I2C0_IRQ_Handler, Haltproc
+  .set I2C1_IRQ_Handler, Haltproc
+  .set RTC_IRQ_Handler, Haltproc
   .text
   end;
 end.

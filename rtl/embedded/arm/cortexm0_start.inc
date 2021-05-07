@@ -16,6 +16,13 @@ asm
    b .Lloop
 end;
 
+procedure _NMI_Handler; assembler; nostackframe; public name '_NMI_Handler';
+asm
+.Lloop:
+   bkpt
+   b .Lloop
+end;
+
 procedure _HardFault_Handler; assembler; nostackframe; public name '_HardFault_Handler';
 asm
 .Lloop:
